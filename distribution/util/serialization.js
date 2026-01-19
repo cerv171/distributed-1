@@ -13,6 +13,9 @@ function serialize(object) {
  * @returns {any}
  */
 function deserialize(string) {
+  if (typeof string !== 'string') {
+    throw new Error(`Invalid argument type: ${typeof string}.`);
+  }
 }
 
 module.exports = {

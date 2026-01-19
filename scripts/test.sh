@@ -51,6 +51,7 @@ check_stale_versions() {
 
 top=$(git rev-parse --show-toplevel)
 check_stale_versions
+
 # Check for leftover ports from previous test runs
 all_ports=$(grep -Rho 'port: [0-9]\+' "$top/test" | cut -d' ' -f2 | sort -n  | uniq)
 for port in $all_ports; do
@@ -139,8 +140,7 @@ if ! $RUN_EXTRA_CREDIT; then
 fi
 
 # Warn if reference implementation is enabled
-top_level=$(git rev-parse --show-toplevel)
-if [ "$(jq -r '.useLibrary' "$top_level/package.json")" = "true" ]; then
+if [ "$(jq -r '.useLibrary' "$top/package.json")" = "true" ]; then
     echo "[test] WARNING: You are using the reference implementation. Set useLibrary to false in package.json to run your own implementation."
 fi
 

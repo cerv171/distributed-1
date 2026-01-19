@@ -16,3 +16,5 @@ lint="npx eslint --ignore-path .gitignore --config .eslintrc --rulesdir scripts/
 [ -n "$fix" ] && lint="$lint --fix"
 
 $lint
+
+npx tsc

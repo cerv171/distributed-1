@@ -7,26 +7,31 @@ if ! git rev-parse --is-inside-work-tree &> /dev/null; then
     exit 1
 fi
 
+function staleness()
+{
+  git fetch --quiet
+  branch=$(git symbolic-ref --short HEAD)
+  upstream=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null || true)
+
+  if [ -z "$upstream" ]; then
+    echo "[setup] no upstream configured for $branch"
+    exit 1
+  fi
+
+  behind=$(git rev-list --count HEAD.."$upstream")
+
+  if [ "$behind" -gt 0 ]; then
+    echo "[setup] your branch '$branch' is behind '$upstream' by $behind commits. Please pull the latest changes."
+    git pull --rebase
+  else
+    echo "[setup] your branch '$branch' is up to date with '$upstream'!"
+  fi
+}
+
 top=$(git rev-parse --show-toplevel)
 cd "$top" || exit 1
 
-git fetch --quiet
-branch=$(git symbolic-ref --short HEAD)
-upstream=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null || true)
-
-if [ -z "$upstream" ]; then
-  echo "[setup] no upstream configured for $branch"
-  exit 1
-fi
-
-behind=$(git rev-list --count HEAD.."$upstream")
-
-if [ "$behind" -gt 0 ]; then
-  echo "[setup] your branch '$branch' is behind '$upstream' by $behind commits. Please pull the latest changes."
-  git pull --rebase
-else
-  echo "[setup] your branch '$branch' is up to date with '$upstream'!"
-fi
+if command -v ssh; then staleness; fi
 
 npm install
 ( cd non-distribution && npm install )
