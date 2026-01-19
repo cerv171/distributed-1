@@ -7,17 +7,19 @@
 
 /**
  * @param {string} name
- * @param {(e: Error | null, v: Object.<string, Node> | null) => void} callback
+ * @param {Callback} callback
  */
 function get(name, callback) {
+  return callback(new Error('groups.get not implemented'));
 }
 
 /**
  * @param {Config | string} config
  * @param {Object.<string, Node>} group
- * @param {(e: Error | null, v: Object.<string, Node> | null) => void} callback
+ * @param {Callback} callback
  */
 function put(config, group, callback) {
+  return callback(new Error('groups.put not implemented'));
 }
 
 /**
@@ -25,6 +27,7 @@ function put(config, group, callback) {
  * @param {Callback} callback
  */
 function del(name, callback) {
+  return callback(new Error('groups.del not implemented'));
 }
 
 /**
@@ -33,6 +36,7 @@ function del(name, callback) {
  * @param {Callback} callback
  */
 function add(name, node, callback) {
+  return callback(new Error('groups.add not implemented'));
 };
 
 /**
@@ -41,6 +45,7 @@ function add(name, node, callback) {
  * @param {Callback} callback
  */
 function rem(name, node, callback) {
+  return callback(new Error('groups.rem not implemented'));
 };
 
 module.exports = {get, put, del, add, rem};

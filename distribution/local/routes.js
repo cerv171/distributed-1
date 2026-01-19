@@ -10,6 +10,7 @@
  * @returns {void}
  */
 function get(configuration, callback) {
+  return callback(new Error('routes.get not implemented'));
 }
 
 /**
@@ -19,6 +20,7 @@ function get(configuration, callback) {
  * @returns {void}
  */
 function put(service, configuration, callback) {
+  return callback(new Error('routes.put not implemented'));
 }
 
 /**
@@ -26,6 +28,7 @@ function put(service, configuration, callback) {
  * @param {Callback} callback
  */
 function rem(configuration, callback) {
+  return callback(new Error('routes.rem not implemented'));
 }
 
 module.exports = {get, put, rem};

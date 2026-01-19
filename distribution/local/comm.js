@@ -21,6 +21,7 @@ const http = require('node:http');
  * @returns {void}
  */
 function send(message, remote, callback) {
+  return callback(new Error('comm.send not implemented'));
 }
 
 module.exports = {send};
