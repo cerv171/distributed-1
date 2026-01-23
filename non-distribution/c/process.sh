@@ -11,3 +11,9 @@
 # Tip: Make sure your program doesn't emit a non-zero exit code if there are no words left after removing stopwords.
 # You can combine the grep invocation with `|| true` to achieve this. Be careful though, as this will also hide other errors!
 
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+tr -cs 'a-zA-Z' '\n' \
+| tr '[:upper:]' '[:lower:]' \
+| iconv  -c -f UTF-8 -t ASCII \
+| grep -vwFf "$SCRIPT_DIR/../d/stopwords.txt" || true

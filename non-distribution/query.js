@@ -27,10 +27,48 @@ For example, `execSync(`echo "${input}" | ./c/process.sh`, {encoding: 'utf-8'});
 
 const fs = require('fs');
 const {execSync} = require('child_process');
-const path = require('path');
+// const path = require('path');
 
 
 function query(indexFile, args) {
+  const words = args.join(' ');
+  const normalized = execSync(`echo "${words}" | ./c/process.sh`, {encoding: 'utf-8'});
+  const cleaned = execSync(`echo "${normalized}" | ./c/stem.js`, {encoding: 'utf-8'});
+  if (!cleaned.trim()) return;
+  const query = cleaned.trim().split(/\s+/);
+  const queryWC = query.length;
+  fs.readFile(indexFile, 'utf8', (err, data) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    for (const line of data.split('\n')) {
+      const [lhs] = line.split('|').map((s) => s.trim());
+      if (!line.trim()) continue;
+      const term = lhs.split(' ');
+      const termWC = term.length;
+      if (queryWC > termWC) {
+        continue;
+      }
+      let found = false;
+      for (let i = 0; i < (termWC-queryWC) + 1; i++) {
+        let good = true;
+        for (let j = i; j < i+queryWC; j++) {
+          if (query[j-i] != term[j]) {
+            good = false;
+            break;
+          }
+        }
+        if (good) {
+          found = true;
+          break;
+        }
+      }
+      if (found) {
+        console.log(line);
+      }
+    }
+  });
 }
 
 const args = process.argv.slice(2); // Get command-line arguments
