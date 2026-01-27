@@ -4,7 +4,6 @@ T_FOLDER=${T_FOLDER:-t}
 R_FOLDER=${R_FOLDER:-}
 
 cd "$(dirname "$0")/../../$R_FOLDER" || exit 1
-input="cat"
 global_content="cat | p2 5
 dog | p2 1
 cat dog | p2 1
