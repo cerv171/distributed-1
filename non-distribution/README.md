@@ -1,44 +1,37 @@
-# non-distribution
 
-This milestone aims (among others) to refresh (and confirm) everyone's
-background on developing systems in the languages and libraries used in this
-course.
+# M0: Setup & Centralized Computing
 
-By the end of this assignment you will be familiar with the basics of
-JavaScript, shell scripting, stream processing, Docker containers, deployment
-to AWS, and performance characterization—all of which will be useful for the
-rest of the project.
+> Add your contact information below and in `package.json`.
 
-Your task is to implement a simple search engine that crawls a set of web
-pages, indexes them, and allows users to query the index. All the components
-will run on a single machine.
+* name: `Colin Pascual`
 
-## Getting Started
+* email: `colin_pascual@brown.edu`
 
-To get started with this milestone, run `npm install` inside this folder. To
-execute the (initially unimplemented) crawler run `./engine.sh`. Use
-`./query.js` to query the produced index. To run tests, do `npm run test`.
-Initially, these will fail.
+* cslogin: `ctpascua`
 
-### Overview
 
-The code inside `non-distribution` is organized as follows:
+## Summary
 
-```
-.
-├── c            # The components of your search engine
-├── d            # Data files like seed urls and the produced index
-├── s            # Utility scripts for linting your solutions
-├── t            # Tests for your search engine
-├── README.md    # This file
-├── crawl.sh     # The crawler
-├── index.sh     # The indexer
-├── engine.sh    # The orchestrator script that runs the crawler and the indexer
-├── package.json # The npm package file that holds information like JavaScript dependencies
-└── query.js     # The script you can use to query the produced global index
-```
+> Summarize your implementation, including the most challenging aspects; remember to update the `report` section of the `package.json` file with the total number of hours it took you to complete M0 (`hours`), the total number of JavaScript lines you added, including tests (`jsloc`), the total number of shell lines you added, including for deployment and testing (`sloc`).
 
-### Submitting
 
-To submit your solution, run `./scripts/submit.sh` from the root of the stencil. This will create a
-`submission.zip` file which you can upload to the autograder.
+My implementation consists of 8 components addressing T1--8. The most challenging aspect was implementing the merge.js component because it required lots of refreshing on javascript syntax and parsing, and carefully reasoning through data states to ensure that my output global-index.txt was consistent with what we expected.
+
+
+## Correctness & Performance Characterization
+
+
+> Describe how you characterized the correctness and performance of your implementation.
+
+
+To characterize correctness, I developed 10 tests. I wrote end-to-end tests with https://cs.brown.edu/courses/csci1380/sandbox/2/ (a small collection of fullbooks) to ensure that the engine parsed all links as expected and had a resulting index that was correct. Furthermore, I wrote unit-tests for each implemented componenet using the html of https://cs.brown.edu/courses/csci1380/sandbox/1/ as well as edge cases that I curated, especially with query.js ensuring that the type of search we were doing matched the n-gram search expected.
+
+
+*Performance*: The throughput of various subsystems is described in the `"throughput"` portion of package.json. The characteristics of my development machines are summarized in the `"dev"` portion of package.json.
+
+
+## Wild Guess
+
+> How many lines of code do you think it will take to build the fully distributed, scalable version of your search engine? Add that number to the `"dloc"` portion of package.json, and justify your answer below.
+
+I expect to build the fully dsitrbitued scalable version it might take around 3k lines of code, I assume we need to handle things like distributed hash tables for using multiple nodes and handling concurrent writes to our index data which will require lots of code. MapReduce framework for distributed processing will likely also require lots of code.

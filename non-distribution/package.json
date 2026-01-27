@@ -34,16 +34,16 @@
       "jloc": 200,
       "sloc": 100,
       "dev": {
-        "cpu-no": 999,
-        "mem-gb": 999,
-        "ssd-gb": 999
+        "cpu-no": 14,
+        "mem-gb": 48,
+        "ssd-gb": 1000
       },
       "throughput": {
-        "dev": [],
-        "aws": [],
+        "dev": [7027],
+        "aws": [14528.112],
         "gs": []
       },
-      "dloc": -99
+      "dloc": 3000
     }
   ]
 }

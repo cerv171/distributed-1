@@ -12,9 +12,7 @@ cat /dev/null > d/visited.txt
 cat /dev/null > d/global-index.txt
 
 cat "$T_FOLDER"/d/u2.txt > d/urls.txt
-echo "here"
 ./engine.sh
-echo "ran engine"
 EXIT=0
 
 if $DIFF <(sort d/visited.txt) <(sort "$T_FOLDER"/d/v2.txt) >&2;
@@ -24,7 +22,7 @@ else
     echo "$0 failure: visited urls are not identical"
     EXIT=1
 fi
-#seems to be non-deterministic
+#non-determinsitic
 # if DIFF_PERCENT=$DIFF_PERCENT t/gi-diff.js <(sort d/global-index.txt) <(sort "$T_FOLDER"/d/i2.txt) >&2;
 # then
 #     echo "$0 success: global-index is identical"

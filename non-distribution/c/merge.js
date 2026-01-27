@@ -40,7 +40,7 @@ const compare = (a, b) => {
   } else if (a[1] < b[1]) {
     return 1;
   } else {
-    return 0;
+    return a[0].localeCompare(b[0]);
   }
 };
 const rl = readline.createInterface({
@@ -84,13 +84,16 @@ const printMerged = (err, data) => {
   // where keys are terms and values store a url->freq map (one entry per url).
   for (const line of localIndexLines) {
     const [word, freq, url] = line.split('|').map((s) => s.trim());
+    if (!word || word.length === 0) {
+      continue;
+    }
     if (!local[word]) {
       local[word] = {};
     }
     if (!local[word][url]) {
       local[word][url]= 0;
     }
-    local[word][url] += freq;
+    local[word][url] += Number(freq);
   }
 
   // 4. For each line in `globalIndexLines`, parse them and add them to the `global` object
