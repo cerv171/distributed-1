@@ -1,19 +1,20 @@
 #!/bin/bash
 # This is a student test
-cd "$(dirname "$0")" || exit 1
+T_FOLDER=${T_FOLDER:-t}
+R_FOLDER=${R_FOLDER:-}
 
-input="cat | 2 | p1
-dog | 3 | p1
-mouse | 1 | p2"
+cd "$(dirname "$0")/../../$R_FOLDER" || exit 1
+input="cat"
 global_content="cat | p2 5
-dog | p2 1"
-global_index=$(mktemp)
-echo "$global_content" > "$global_index"
-result=$(echo "$input" | ../../c/merge.js "$global_index")
-rm "$global_index"
-expected="cat | p2 5 p1 2
-dog | p1 3 p2 1
-mouse | p2 1"
+dog | p2 1
+cat dog | p2 1
+cats ca cats | p2 5
+cat cat | p2 5"
+echo "$global_content" > d/global-index.txt
+result=$(./query.js cat)
+expected="cat | p2 5
+cat dog | p2 1
+cat cat | p2 5"
 if [ "$result" = "$expected" ]; then
   echo "Test passed"
   exit 0

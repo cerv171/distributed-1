@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Quotes to Scrape</title>
+    <link rel="stylesheet" href="../../static/bootstrap.min.css">
+    <link rel="stylesheet" href="../../static/main.css">
+</head>
+<body>
+    <div class="container">
+        <div class="row header-box">
+            <div class="col-md-8">
+                <h1>
+                    <a href="../../index.html" style="text-decoration: none">Quotes to Scrape</a>
+                </h1>
+            </div>
+            <div class="col-md-4">
+                <p>
+                
+                    <a href="../../login.html">Login</a>
+                
+                </p>
+            </div>
+        </div>
+    
+
+<h3>Viewing tag: <a href="page/1/index.html">friendship</a></h3>
+
+<div class="row">
+    <div class="col-md-8">
+
+    <div class="quote" itemscope itemtype="http://schema.org/CreativeWork">
+        <span class="text" itemprop="text">“It is not a lack of love, but a lack of friendship that makes unhappy marriages.”</span>
+        <span>by <small class="author" itemprop="author">Friedrich Nietzsche</small>
+        <a href="../../author/Friedrich-Nietzsche.html">(about)</a>
+        </span>
+        <div class="tags">
+            Tags:
+            <meta class="keywords" itemprop="keywords" content="friendship,lack-of-friendship,lack-of-love,love,marriage,unhappy-marriage" /    > 
+            
+            <a class="tag" href="page/1/index.html">friendship</a>
+            
+            <a class="tag" href="../lack-of-friendship/page/1/index.html">lack-of-friendship</a>
+            
+            <a class="tag" href="../lack-of-love/page/1/index.html">lack-of-love</a>
+            
+            <a class="tag" href="../love/page/1/index.html">love</a>
+            
+            <a class="tag" href="../marriage/page/1/index.html">marriage</a>
+            
+            <a class="tag" href="../unhappy-marriage/page/1/index.html">unhappy-marriage</a>
+            
+        </div>
+    </div>
+
+    <div class="quote" itemscope itemtype="http://schema.org/CreativeWork">
+        <span class="text" itemprop="text">“Good friends, good books, and a sleepy conscience: this is the ideal life.”</span>
+        <span>by <small class="author" itemprop="author">Mark Twain</small>
+        <a href="../../author/Mark-Twain.html">(about)</a>
+        </span>
+        <div class="tags">
+            Tags:
+            <meta class="keywords" itemprop="keywords" content="books,contentment,friends,friendship,life" /    > 
+            
+            <a class="tag" href="../books/page/1/index.html">books</a>
+            
+            <a class="tag" href="../contentment/page/1/index.html">contentment</a>
+            
+            <a class="tag" href="../friends/page/1/index.html">friends</a>
+            
+            <a class="tag" href="page/1/index.html">friendship</a>
+            
+            <a class="tag" href="../life/page/1/index.html">life</a>
+            
+        </div>
+    </div>
+
+    <div class="quote" itemscope itemtype="http://schema.org/CreativeWork">
+        <span class="text" itemprop="text">“The truth is, everyone is going to hurt you. You just got to find the ones worth suffering for.”</span>
+        <span>by <small class="author" itemprop="author">Bob Marley</small>
+        <a href="../../author/Bob-Marley.html">(about)</a>
+        </span>
+        <div class="tags">
+            Tags:
+            <meta class="keywords" itemprop="keywords" content="friendship" /    > 
+            
+            <a class="tag" href="page/1/index.html">friendship</a>
+            
+        </div>
+    </div>
+
+    <div class="quote" itemscope itemtype="http://schema.org/CreativeWork">
+        <span class="text" itemprop="text">“There is nothing I would not do for those who are really my friends. I have no notion of loving people by halves, it is not my nature.”</span>
+        <span>by <small class="author" itemprop="author">Jane Austen</small>
+        <a href="../../author/Jane-Austen.html">(about)</a>
+        </span>
+        <div class="tags">
+            Tags:
+            <meta class="keywords" itemprop="keywords" content="friendship,love" /    > 
+            
+            <a class="tag" href="page/1/index.html">friendship</a>
+            
+            <a class="tag" href="../love/page/1/index.html">love</a>
+            
+        </div>
+    </div>
+
+    <div class="quote" itemscope itemtype="http://schema.org/CreativeWork">
+        <span class="text" itemprop="text">“If I had a flower for every time I thought of you...I could walk through my garden forever.”</span>
+        <span>by <small class="author" itemprop="author">Alfred Tennyson</small>
+        <a href="../../author/Alfred-Tennyson.html">(about)</a>
+        </span>
+        <div class="tags">
+            Tags:
+            <meta class="keywords" itemprop="keywords" content="friendship,love" /    > 
+            
+            <a class="tag" href="page/1/index.html">friendship</a>
+            
+            <a class="tag" href="../love/page/1/index.html">love</a>
+            
+        </div>
+    </div>
+
+    <nav>
+        <ul class="pager">
+            
+            
+        </ul>
+    </nav>
+    </div>
+    <div class="col-md-4 tags-box">
+        
+            <h2>Top Ten tags</h2>
+            
+            <span class="tag-item">
+            <a class="tag" style="font-size: 28px" href="../love/index.html">love</a>
+            </span>
+            
+            <span class="tag-item">
+            <a class="tag" style="font-size: 26px" href="../inspirational/index.html">inspirational</a>
+            </span>
+            
+            <span class="tag-item">
+            <a class="tag" style="font-size: 26px" href="../life/index.html">life</a>
+            </span>
+            
+            <span class="tag-item">
+            <a class="tag" style="font-size: 24px" href="../humor/index.html">humor</a>
+            </span>
+            
+            <span class="tag-item">
+            <a class="tag" style="font-size: 22px" href="../books/index.html">books</a>
+            </span>
+            
+            <span class="tag-item">
+            <a class="tag" style="font-size: 14px" href="../reading/index.html">reading</a>
+            </span>
+            
+            <span class="tag-item">
+            <a class="tag" style="font-size: 10px" href="index.html">friendship</a>
+            </span>
+            
+            <span class="tag-item">
+            <a class="tag" style="font-size: 8px" href="../friends/index.html">friends</a>
+            </span>
+            
+            <span class="tag-item">
+            <a class="tag" style="font-size: 8px" href="../truth/index.html">truth</a>
+            </span>
+            
+            <span class="tag-item">
+            <a class="tag" style="font-size: 6px" href="../simile/index.html">simile</a>
+            </span>
+            
+        
+    </div>
+</div>
+
+    </div>
+    
+</body>
+</html>
