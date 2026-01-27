@@ -2,9 +2,9 @@
   "name": "cs1380:m0",
   "version": "1.0.0",
   "author": {
-    "name": "<first last?>",
-    "email": "<email@brown.edu?>",
-    "cslogin": "<cslogin?>"
+    "name": "Colin Pascual",
+    "email": "colin_pascual@brown.edu",
+    "cslogin": "ctpascua"
   },
   "description": "A set of components for cs1380's search engine.",
   "dependencies": {
@@ -23,14 +23,16 @@
     "jest": "^29.7.0"
   },
   "ec2": {
-    "ip": "0.0.0.0",
+    "ip": "52.14.156.76",
     "port": 8080
   },
   "report": [
     {
       "milestone": "M0",
-      "hours": 999,
-      "loc": 999,
+      "hours": 5,
+      "loc": 300,
+      "jloc": 200,
+      "sloc": 100,
       "dev": {
         "cpu-no": 999,
         "mem-gb": 999,
