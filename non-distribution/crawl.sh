@@ -9,7 +9,7 @@ fi
 
 echo "$1" >>d/visited.txt
 
-c/getURLs.js "$1" <"$tmp_file" | grep -vxf d/visited.txt >>d/urls.txt
+c/getURLs.js "$1" <"$tmp_file" | grep -vxf d/visited.txt | grep -vxf d/urls.txt >>d/urls.txt
 c/getText.js <"$tmp_file"
 
 rm -f "$tmp_file"

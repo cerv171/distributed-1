@@ -27,7 +27,39 @@ My implementation consists of 8 components addressing T1--8. The most challengin
 To characterize correctness, I developed 10 tests. I wrote end-to-end tests with https://cs.brown.edu/courses/csci1380/sandbox/2/ (a small collection of fullbooks) to ensure that the engine parsed all links as expected and had a resulting index that was correct. Furthermore, I wrote unit-tests for each implemented componenet using the html of https://cs.brown.edu/courses/csci1380/sandbox/1/ as well as edge cases that I curated, especially with query.js ensuring that the type of search we were doing matched the n-gram search expected.
 
 
-*Performance*: The throughput of various subsystems is described in the `"throughput"` portion of package.json. The characteristics of my development machines are summarized in the `"dev"` portion of package.json.
+*Performance*: The throughput of various subsystems is described in the `"throughput"` portion of package.json. I measured throughput of crawl.sh and index.sh on the sandbox/1 and sandbox/2 site given to us and got the statistics here:
+
+Local:
+
+Avg crawl time: 3.33 page/sec
+Avg index time: 0.65 page/sec
+Total time: 4.737745000s
+Throughput: 2.110 URLs/sec
+
+AWS:
+
+For the sandbox/2 with much larger pages i got the results below:
+
+Local:
+
+Avg crawl time: 2.02 / s
+Avg index time: 0.04 page / s
+Total time: 104.540851000s
+Throughput: .038 URLs/sec
+
+AWS:
+
+
+
+I measured the performance of query.js by running the script query_metrics.sh, querying for random terms within the sandbox/2 global index and found the throughput:
+
+Local:
+    4.42 queries / sec
+
+AWS:
+    
+
+ The characteristics of my development machines are summarized in the `"dev"` portion of package.json. 
 
 
 ## Wild Guess

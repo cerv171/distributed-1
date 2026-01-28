@@ -9,6 +9,9 @@ while read -r url; do
     exit;
   fi
 
+  if grep -qxF "$url" d/visited.txt; then
+    continue
+  fi
   echo "[engine] crawling $url">/dev/stderr
   ./crawl.sh "$url" >d/content.txt
   echo "[engine] indexing $url">/dev/stderr
