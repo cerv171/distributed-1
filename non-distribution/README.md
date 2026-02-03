@@ -29,35 +29,29 @@ To characterize correctness, I developed 10 tests. I wrote end-to-end tests with
 
 *Performance*: The throughput of various subsystems is described in the `"throughput"` portion of package.json. I measured throughput of crawl.sh and index.sh on the sandbox/1 and sandbox/2 site given to us and got the statistics here:
 
-Local:
+### Sandbox/1 (Small Pages)
 
-Avg crawl time: 3.33 page/sec
-Avg index time: 0.65 page/sec
-Total time: 4.737745000s
-Throughput: 2.110 URLs/sec
+| Metric          | Local         | AWS           |
+|-----------------|---------------|---------------|
+| Avg crawl time  | 3.33 page/sec | 1.00 page/sec |
+| Avg index time  | 6.25 page/sec | 1.63 page/sec |
+| Total time      | 4.74s         | 16.61s        |
+| Throughput      | 2.11 URLs/sec | 0.60 URLs/sec |
 
-AWS:
+### Sandbox/2 (Large Pages)
 
-For the sandbox/2 with much larger pages i got the results below:
+| Metric          | Local         | AWS           |
+|-----------------|---------------|---------------|
+| Avg crawl time  | 2.02 page/sec | 0.76 page/sec |
+| Avg index time  | 0.04 page/sec | 0.27 page/sec |
+| Total time      | 104.54s       | 20.00s        |
+| Throughput      | 0.04 URLs/sec | 0.20 URLs/sec |
 
-Local:
+### Query Performance (Sandbox/2 Index)
 
-Avg crawl time: 2.02 / s
-Avg index time: 0.04 page / s
-Total time: 104.540851000s
-Throughput: .038 URLs/sec
-
-AWS:
-
-
-
-I measured the performance of query.js by running the script query_metrics.sh, querying for random terms within the sandbox/2 global index and found the throughput:
-
-Local:
-    4.42 queries / sec
-
-AWS:
-    
+| Metric     | Local           | AWS             |
+|------------|-----------------|-----------------|
+| Throughput | 4.42 queries/sec | 1.13 queries/sec |
 
  The characteristics of my development machines are summarized in the `"dev"` portion of package.json. 
 

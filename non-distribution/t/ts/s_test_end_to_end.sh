@@ -22,7 +22,7 @@ else
     echo "$0 failure: visited urls are not identical"
     EXIT=1
 fi
-#non-determinsitic
+# non-determinsitic
 # if DIFF_PERCENT=$DIFF_PERCENT t/gi-diff.js <(sort d/global-index.txt) <(sort "$T_FOLDER"/d/i2.txt) >&2;
 # then
 #     echo "$0 success: global-index is identical"

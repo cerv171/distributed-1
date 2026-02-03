@@ -7,7 +7,7 @@ test('(3 pts) (scenario) 40 bytes object', () => {
           Come up with a JavaScript object, which when serialized,
           will result in a string that is 40 bytes in size.
       */
-  let object = null;
+  const object = 'oooooooooooo';
 
   const serialized = util.serialize(object);
   expect(serialized.length).toEqual(40);
@@ -15,9 +15,8 @@ test('(3 pts) (scenario) 40 bytes object', () => {
 
 test('(3 pts) (scenario) expected object', () => {
   /* Prepare an object so it results in an expected serialized string. */
-  let object = null;
-
-  let serializedObject = ''; /* Add here the expected serialized string by using util.serialize */
+  const object = 'leo';
+  const serializedObject = '{"type":"string","value":"leo"}'; /* Add here the expected serialized string by using util.serialize */
   expect(util.serialize(object)).toEqual(serializedObject);
 });
 
@@ -27,7 +26,7 @@ test('(3 pts) (scenario) string deserialized into target object', () => {
           {a: 1, b: "two", c: false}
       */
 
-  let string = null;
+  const string = '{"type":"object","value":{"a":{"type":"number","value":"1"},"b":{"type":"string","value":"two"},"c":{"type":"boolean","value":"false"}}}';
 
 
   const object = {a: 1, b: 'two', c: false};
@@ -38,7 +37,18 @@ test('(3 pts) (scenario) string deserialized into target object', () => {
 test('(3 pts) (scenario) object with all supported data types', () => {
 /* Come up with an object that uses all valid (serializable)
     built-in data types supported by the serialization library. */
-  let object = null;
+  const object = {
+    loe: new Date(),
+    numb: 1,
+    arr: [1],
+    error: Error('bad'),
+    object: {s: 's'},
+    boolean: true,
+    func: (x) => x*2,
+    nul: null,
+    undef: undefined,
+    str: 'string',
+  };
 
   const setTypes = [];
   for (const k in object) {
@@ -72,7 +82,7 @@ test('(3 pts) (scenario) object with all supported data types', () => {
 test('(3 pts) (scenario) malformed serialized string', () => {
 /* Come up with a string that is not a valid serialized object. */
 
-  let malformedSerializedString = null;
+  const malformedSerializedString = '{"type":"object","value":{1:{"type":"number","value":"1"},"b":{"type":"string","value":"two"},"c":{"type":"boolean","value":"false"}}}';
 
 
   expect(() => {
