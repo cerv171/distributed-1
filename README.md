@@ -140,4 +140,4 @@ My implementation comprises of around 150 lines fo code for the serialization an
 *Correctness*: I wrote 5 tests; these tests take 0.11s to execute. This includes basic objects corresponding to all expected data types, different structures of functions (named, recursive, arrow funtions), and edge cases like large recursive structures like trees, recursive error objects, large arrays, and non-serializable objects.
 
 
-*Performance*: The latency of various subsystems is described in the `"latency"` portion of package.json, each corresponding to ms it takes to run 1000 iterations on data objects I curated for T2-T4 (basic types, functions, recursive structures). The characteristics of my development machines are summarized in the `"dev"` portion of package.json.
+*Performance*: The latency of various subsystems is described in the `"latency"` portion of package.json, each corresponding to ms it takes to serialize and then deserialize 1000 iterations on data objects I curated for T2-T4 (basic types, functions, recursive structures). The characteristics of my development machines are summarized in the `"dev"` portion of package.json.
