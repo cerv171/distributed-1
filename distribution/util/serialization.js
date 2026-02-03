@@ -60,10 +60,7 @@ function getType(value) {
   if (typeof value === 'object') return 'object';
   return typeof value;
 }
-/**
- * @param {string} string
- * @returns {any}
- */
+
 function deserialize(string) {
   if (typeof string !== 'string') {
     throw new Error(`Invalid argument type: ${typeof string}.`);
@@ -113,7 +110,7 @@ function ds(obj) {
   if (type == 'undefined') {
     return undefined;
   }
-  throw new Error('not a real type');
+  throw new Error('not a type');
 }
 
 function deserializeNumber(value) {

@@ -28,7 +28,7 @@ test('(1 pts) simple test all types', () => {
 });
 
 
-test('(1 pts) nested empty arrays and objects', () => {
+test('(1 pts) nested arrays and objects', () => {
   const object = {
     '4': {
       '3': {
@@ -41,6 +41,12 @@ test('(1 pts) nested empty arrays and objects', () => {
   const serialized = distribution.util.serialize(object);
   const deserialized = distribution.util.deserialize(serialized);
   expect(deserialized).toEqual(object);
+
+  let curNode = {child: 'end'};
+  for (let i = 0; i < 50; i++) {
+    curNode = {child: curNode, val: i};
+  }
+  expect(distribution.util.deserialize(distribution.util.serialize(curNode))).toEqual(curNode);
 });
 
 
@@ -53,14 +59,33 @@ test('(1 pts) test nested errors', () => {
   expect(deserialized.cause.message).toBe('root');
 });
 
-test('(1 pts) detects not serializable', () => {
-  const malformedSerializedString = '{"type":"object","value":{1:{"type":"number","value":"1"},"b":{"type":"string","value":"two"},"c":{"type":"boolean","value":"false"}}}';
-  expect(() => {
-    distribution.util.deserialize(malformedSerializedString);
-  }).toThrow(Error);
+test('(1 pts) handles various types of functions', () => {
+  const object = [
+    function add(a, b) {
+      return a + b;
+    },
+    function() {
+      return 42;
+    },
+    (x) => x * 2,
+    (a, b) => a + b,
+    () => {},
+    function recursive(n) {
+      return n = 1 ? 1 : recursive(n - 1);
+    },
+  ];
+  const serialized = distribution.util.serialize(object);
+  const deserialized = distribution.util.deserialize(serialized);
+  //test function behavior
+  expect(deserialized[0](2, 3)).toBe(5);
+  expect(deserialized[1]()).toBe(42);
+  expect(deserialized[2](4)).toBe(8);
+  expect(deserialized[3](10, 20)).toBe(object[3](10, 20));
+  expect(deserialized[4]()).toBe(undefined);
+  expect(deserialized[5](5)).toBe(object[5](5));
 });
 
-test('(1 pts) test nan and more types', () => {
+test('(1 pts) test nan and not  serializable', () => {
   const object = {
     'hello': 'world',
     'missing': undefined,
@@ -71,4 +96,10 @@ test('(1 pts) test nan and more types', () => {
   const serialized = distribution.util.serialize(object);
   const deserialized = distribution.util.deserialize(serialized);
   expect(deserialized).toEqual(object);
+
+  const malformedSerializedString = '{"type":"object","value":{1:{"type":"number","value":"1"},"b":{"type":"string","value":"two"},"c":{"type":"boolean","value":"false"}}}';
+  expect(() => {
+    distribution.util.deserialize(malformedSerializedString);
+  }).toThrow(Error);
 });
+
