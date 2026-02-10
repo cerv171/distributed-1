@@ -1,3 +1,5 @@
+const store = require('../../distribution/all/store.js');
+
 require('../../distribution.js')();
 const distribution = globalThis.distribution;
 
@@ -14,7 +16,9 @@ test('(2 pts) (scenario) simple callback practice', () => {
     results.push(result);
   }
 
-  // ...
+  add(3, 0, storeResults);
+  add(5,0, storeResults);
+  add(7, 0 , storeResults);
 
   expect(results).toEqual([3, 5, 7]);
 });
