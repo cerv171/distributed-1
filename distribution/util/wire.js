@@ -13,6 +13,7 @@ const log = require('../util/log.js');
  */
 function createRPC(func) {
   // Write some code...
+  console.log('used rpc');
 }
 
 /**

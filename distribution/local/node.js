@@ -4,9 +4,11 @@
  * @typedef {import("../types.js").Callback} Callback
  */
 const http = require('node:http');
-const url = require('node:url');
-const log = require('../util/log.js');
-
+// const url = require('node:url');
+// const log = require('../util/log.js');
+const util = require('../util/util.js');
+const routes = require('./routes.js');
+const status = require('./status.js');
 const yargs = require('yargs/yargs');
 
 /**
@@ -84,15 +86,16 @@ function start(callback) {
     /* Your server will be listening for PUT requests. */
 
     // Write some code...
+    if (req.method !== 'PUT') {
+      res.end(util.serialize(new Error('only put requests')));
+      return;
+    }
 
 
     /*
       The path of the http request will determine the service to be used.
       The url will have the form: http://node_ip:node_port/service/method
     */
-
-    // Write some code...
-
 
     /*
       A common pattern in handling HTTP requests in Node.js is to have a
@@ -109,24 +112,51 @@ function start(callback) {
     */
 
     // Write some code...
-
+    const [, gid, service, method] = req.url.split('/');
     /** @type {any[]} */
     const body = [];
 
     req.on('data', (chunk) => {
+      body.push(chunk);
     });
 
     req.on('end', () => {
-
       /*
         Here, you can handle the service requests.
         Use the local routes service to get the service you need to call.
         You need to call the service with the method and arguments provided in the request.
         Then, you need to serialize the result and send it back to the caller.
       */
-
-      // Write some code...
-
+      status.incCounts();
+      const str = Buffer.concat(body).toString();
+      let message;
+      try {
+        message = util.deserialize(str);
+      } catch (e) {
+        res.end(util.serialize([e, null]));
+        return;
+      };
+      if (!Array.isArray(message)) {
+        res.end(util.serialize([new Error('message must be array'), null]));
+        return;
+      }
+      const serviceCall = {
+        gid: gid,
+        service: service,
+      };
+      routes.get(serviceCall, (e, s) => {
+        if (e) {
+          res.end(util.serialize([e, null]));
+          return;
+        }
+        if (!s[method]) {
+          res.end(util.serialize([Error(`method ${method} not found`), null]));
+          return;
+        }
+        s[method](...message, (e, v) => {
+          res.end(util.serialize([e, v]));
+        });
+      });
     });
   });
 

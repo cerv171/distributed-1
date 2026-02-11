@@ -3,14 +3,26 @@
  * @typedef {string} ServiceName
  */
 
-
+const routes = {};
 /**
  * @param {ServiceName | {service: ServiceName, gid?: string}} configuration
  * @param {Callback} callback
  * @returns {void}
  */
 function get(configuration, callback) {
-  return callback(new Error('routes.get not implemented'));
+  let service;
+  if (typeof configuration == 'string') {
+    service = configuration;
+  } else if (configuration && typeof configuration == 'object' && configuration.service) {
+    service = configuration.service;
+  } else {
+    return callback(new Error('invalid config'));
+  }
+  if (service in routes) {
+    return callback(null, routes[service]);
+  } else {
+    return callback(new Error(`Service ${service} not in routes`));
+  }
 }
 
 /**
@@ -20,7 +32,8 @@ function get(configuration, callback) {
  * @returns {void}
  */
 function put(service, configuration, callback) {
-  return callback(new Error('routes.put not implemented'));
+  routes[configuration] = service;
+  return callback(null, configuration);
 }
 
 /**
@@ -28,7 +41,13 @@ function put(service, configuration, callback) {
  * @param {Callback} callback
  */
 function rem(configuration, callback) {
-  return callback(new Error('routes.rem not implemented'));
+  if (configuration in routes) {
+    const service = routes[configuration];
+    delete routes[configuration];
+    return callback(null, service);
+  } else {
+    return callback(new Error(`Service ${configuration} not in routes`));
+  }
 }
 
 module.exports = {get, put, rem};
