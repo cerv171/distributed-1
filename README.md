@@ -162,7 +162,7 @@ My implementation comprises 4 software components, totaling 300 lines of code. S
 *Correctness*: I wrote 5 tests on various edge cases like overwriting services, basic putting a service and calling it using comm, no callback/missing parameters to function calls error checking, removing a nonexisting service; these tests take 3.6 seconds to execute.
 
 
-*Performance*: I characterized the performance of comm and RPC by sending 1000 service requests in a tight loop. Average throughput and latency is recorded in `package.json`. In the form [latency (ms/rq), throughput (req/sec)].
+*Performance*: I characterized the performance of comm and RPC by sending 1000 service requests in a tight loop. Average throughput and latency is recorded in `package.json`. In the form latency (ms/rq), throughput (req/sec), with the first entry being my benchmark_m2.js script in the scripts dir, the other being the benchmark_m2_rpc.js script in the scripts dir.
 
 
 ## Key Feature

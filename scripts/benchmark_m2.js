@@ -12,6 +12,7 @@ distribution.node.start(() => {
       callback();
     });
   };
+  console.log('spawning');
   distribution.local.status.spawn(node, (e, v) => {
     console.log('spawned');
     const REQUESTS = 1000;
