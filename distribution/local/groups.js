@@ -1,16 +1,23 @@
-// @ts-check
+//@ts-check
 /**
  * @typedef {import("../types.js").Callback} Callback
  * @typedef {import("../types.js").Config} Config
  * @typedef {import("../types.js").Node} Node
  */
 
+const { id } = require("../util/util.js");
+
+/** @type {Object.<string, Object.<string, Node>>} */
+const groups = {};
 /**
  * @param {string} name
  * @param {Callback} callback
  */
 function get(name, callback) {
-  return callback(new Error('groups.get not implemented'));
+  if (name in groups) {
+    return callback(null, groups[name]);
+  }
+  return callback(new Error(`name not ${name} not in groups`));
 }
 
 /**
@@ -19,7 +26,11 @@ function get(name, callback) {
  * @param {Callback} callback
  */
 function put(config, group, callback) {
-  return callback(new Error('groups.put not implemented'));
+  if (typeof config != 'string') {
+    config = config.gid;
+  }
+  groups[config] = group;
+  return callback(null, groups[config]);
 }
 
 /**
@@ -27,7 +38,8 @@ function put(config, group, callback) {
  * @param {Callback} callback
  */
 function del(name, callback) {
-  return callback(new Error('groups.del not implemented'));
+  delete groups[name];
+  return callback(null, {});
 }
 
 /**
@@ -36,7 +48,11 @@ function del(name, callback) {
  * @param {Callback} callback
  */
 function add(name, node, callback) {
-  return callback(new Error('groups.add not implemented'));
+  if (!(name in groups)) {
+    groups[name] = {};
+  }
+  groups[name][id.getSID(node)] = node;
+  return callback(null ,node);
 };
 
 /**
@@ -45,7 +61,14 @@ function add(name, node, callback) {
  * @param {Callback} callback
  */
 function rem(name, node, callback) {
-  return callback(new Error('groups.rem not implemented'));
+  if (!(name in groups)) {
+    return callback(new Error(`name ${name} not in groups`));
+  }
+  if (!(Object.keys(groups[name]).includes(node))) {
+    return callback(new Error(`node ${node} not in ${groups[name]}`));
+  }
+  delete groups[name][node];
+  return callback(null, groups[name]);
 };
 
 module.exports = {get, put, del, add, rem};

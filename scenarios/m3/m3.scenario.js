@@ -1,3 +1,6 @@
+const local = require('@brown-ds/distribution/distribution/local/local.js');
+const node = require('@brown-ds/distribution/distribution/local/node.js');
+
 require('../../distribution.js')();
 const distribution = globalThis.distribution;
 const id = distribution.util.id;
@@ -14,18 +17,15 @@ test('(5 pts) (scenario) create group', (done) => {
     Then, fetch their NIDs using the distributed status service.
 */
 
-  const groupA = {};
-  groupA[id.getSID(n1)] = n1;
-  // Add nodes n2 and n3 to the group...
-
+const groupA = Object.fromEntries(allNodes.map((node) => [id.getSID(node), node]));
   const nids = Object.values(allNodes).map((node) => id.getNID(node));
-
   // Use distribution.local.groups.put to add groupA to the local node
   // Note: The groupA.status.get call should be inside the put method's callback.
+  distribution.local.groups.put('groupA', groupA, (e, v) =>
     distribution.groupA.status.get('nid', (e, v) => {
       expect(Object.values(v)).toEqual(expect.arrayContaining(nids));
       done();
-    });
+    }));
 });
 
 test('(5 pts) (scenario) dynamic group membership', (done) => {
@@ -34,21 +34,19 @@ test('(5 pts) (scenario) dynamic group membership', (done) => {
   with nodes n1 and n2. Validate that the distributed status service reflects
   the updated group membership on all nodes.
 */
-  const groupB = {};
   // Pick some initial nodes...
-  let initialNodes = ['?'];
+  let initialNodes = [n1, n2];
   // Pick the final set of nodes...
-  let allNodes = ['?'];
+  let allNodes = [n1, n2, n3];
 
   // Create groupB...
-  groupB[id.getSID(n1)] = n1;
-
+  const groupB = Object.fromEntries(initialNodes.map((node) => [id.getSID(node), node]));
   const config = {gid: 'groupB'};
 
   // Create the group with initial nodes
   distribution.local.groups.put(config, groupB, (e, v) => {
     // Add a new node dynamically to the group
-
+    distribution.local.groups.add('groupB', n3 ,(e,v) =>
       distribution.groupB.status.get('nid', (e, v) => {
         try {
           expect(Object.values(v)).toEqual(expect.arrayContaining(
@@ -57,7 +55,8 @@ test('(5 pts) (scenario) dynamic group membership', (done) => {
         } catch (error) {
           done(error);
         }
-      });
+      })
+    );
   });
 });
 
@@ -67,7 +66,7 @@ test('(5 pts) (scenario) group relativity', (done) => {
     Make it so that node n1 sees group groupC as containing only n2.
     while node n2 sees group groupC as containing n1 and n2.
 */
-  const groupC = {};
+  const groupC = {[id.getSID(n2)]:n2, [id.getSID(n1)]: n1};
   // Create groupC in an appropriate way...
 
 
@@ -76,7 +75,8 @@ test('(5 pts) (scenario) group relativity', (done) => {
   distribution.local.groups.put(config, groupC, (e, v) => {
     distribution.groupC.groups.put(config, groupC, (e, v) => {
       // Modify the local 'view' of the group...
-
+      // const n1Only = {[id.getNID(n1)]: n1};
+      // distribution.local.groups.send(, (e,v) => {
         distribution.groupC.groups.get('groupC', (e, v) => {
           const n1View = v[id.getSID(n1)];
           const n2View = v[id.getSID(n2)];
@@ -92,6 +92,7 @@ test('(5 pts) (scenario) group relativity', (done) => {
             done(error);
           }
         });
+      // });
     });
   });
 });
