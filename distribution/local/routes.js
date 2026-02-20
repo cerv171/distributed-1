@@ -11,17 +11,30 @@ const routes = {};
  */
 function get(configuration, callback) {
   let service;
+  let gid;
   if (typeof configuration == 'string') {
     service = configuration;
-  } else if (configuration && typeof configuration == 'object' && configuration.service) {
+  } else if (configuration && typeof configuration == 'object' && configuration.service && configuration.gid) {
     service = configuration.service;
+    gid = configuration.gid;
   } else {
     return callback(new Error('invalid config'));
   }
-  if (service in routes) {
-    return callback(null, routes[service]);
-  } else {
-    return callback(new Error(`Service ${service} not in routes`));
+  if (gid == 'local') {
+    if (service in routes) {
+      return callback(null, routes[service]);
+    } else {
+      return callback(new Error(`Service ${service} not in routes`));
+    }
+  }
+  else {
+    if (!(gid in globalThis.distribution)) {
+      return callback(new Error(`gid ${gid} not in distribution`));
+    }
+    if (!(service in globalThis.distribution[gid])) {
+      return callback(new Error(`service ${service} not in ${gid}`));
+    }
+    return callback(null, globalThis.distribution[gid][service]);
   }
 }
 

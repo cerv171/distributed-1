@@ -23,7 +23,21 @@ function status(config) {
    * @param {Callback} callback
    */
   function get(configuration, callback) {
-    callback(new Error('status.get not implemented'));
+    const remote = {service: 'status', method: 'get' };
+    globalThis.distribution[context.gid].comm.send(configuration, remote, (e,v) => {
+      if (e) {
+        return callback(e);
+      }
+      let total = 0;
+      for (const [key, val] of Object.entries(v)) {
+        if (typeof(val) == 'number') {
+          total += val;
+        } else {
+          console.log(`bad status ${key}, ${val}`);
+        }
+      }
+      callback(null, total);
+    });
   }
 
   /**
@@ -31,14 +45,27 @@ function status(config) {
    * @param {Callback} callback
    */
   function spawn(configuration, callback) {
-    callback(new Error('status.spawn not implemented')); // If you won't implement this, check the skip.sh script.
+    const remote = {service: 'status', method: 'spawn'};
+    globalThis.distribution[context.gid].comm.send(configuration, remote, (e, v) => {
+      if (e) {
+        return callback(e);
+      }
+      //not sure what to do yet w/ result
+      callback(null, v);
+    })
   }
 
   /**
    * @param {Callback} callback
    */
   function stop(callback) {
-    callback(new Error('status.stop not implemented')); // If you won't implement this, check the skip.sh script.
+    const remote = {service: 'status', method: 'stop'};
+    globalThis.distribution[context.gid].comm.send([], remote, (e, v) => {
+      if (e) {
+        return callback(e);
+      }
+      callback(null, v);
+    })
   }
 
   return {get, stop, spawn};

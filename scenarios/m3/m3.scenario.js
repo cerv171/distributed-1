@@ -1,5 +1,5 @@
-const local = require('@brown-ds/distribution/distribution/local/local.js');
-const node = require('@brown-ds/distribution/distribution/local/node.js');
+// const local = require('@brown-ds/distribution/distribution/local/local.js');
+// const node = require('@brown-ds/distribution/distribution/local/node.js');
 
 require('../../distribution.js')();
 const distribution = globalThis.distribution;
@@ -75,8 +75,9 @@ test('(5 pts) (scenario) group relativity', (done) => {
   distribution.local.groups.put(config, groupC, (e, v) => {
     distribution.groupC.groups.put(config, groupC, (e, v) => {
       // Modify the local 'view' of the group...
-      // const n1Only = {[id.getNID(n1)]: n1};
-      // distribution.local.groups.send(, (e,v) => {
+      const n2Only = {[id.getSID(n2)]: n2};
+      const commands = {'node': n1, 'gid': 'local', 'service': 'groups', 'method': 'put'}
+      distribution.local.comm.send([config, n2Only], commands, (e,v) => {
         distribution.groupC.groups.get('groupC', (e, v) => {
           const n1View = v[id.getSID(n1)];
           const n2View = v[id.getSID(n2)];
@@ -92,7 +93,7 @@ test('(5 pts) (scenario) group relativity', (done) => {
             done(error);
           }
         });
-      // });
+      });
     });
   });
 });
@@ -111,14 +112,14 @@ test('(5 pts) (scenario) use the gossip service', (done) => {
 */
 
   // Create groupD in an appropriate way...
-  const groupD = {};
+  const groupD = Object.fromEntries(allNodes.map((node) => [id.getSID(node), node]));
 
   // How many nodes are expected to receive the new group membership?
-  let nExpected = 0;
+  let nExpected = 3;
 
   // Experiment with the subset function used in the gossip service...
   // The subset function takes a list of nodes and returns the number of nodes to which the message should be sent
-  let config = {gid: 'groupD', subset: (lst) => '?'};
+  let config = {gid: 'groupD', subset: (lst) => 3};
 
   // Instantiated groupD
   distribution.local.groups.put(config, groupD, (e, v) => {
@@ -134,7 +135,7 @@ test('(5 pts) (scenario) use the gossip service', (done) => {
         // Adding a new node to 'newgroup' using the gossip service
         distribution.groupD.gossip.send(message, remote, (e, v) => {
           // Experiment with the time delay between adding the new node to 'newgroup' and checking the group membership in groupD...
-          let delay = 0;
+          let delay = 4000;
           setTimeout(() => {
             distribution.groupD.groups.get('newgroup', (e, v) => {
               let count = 0;

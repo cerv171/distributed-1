@@ -4,6 +4,7 @@
  * @typedef {import("../types.js").Node} Node
  */
 const util = require('../util/util.js');
+const child_process = require('child_process');
 /**
  * @param {string} configuration
  * @param {Callback} callback
@@ -37,14 +38,27 @@ function incCounts() {
  * @param {Callback} callback
  */
 function spawn(configuration, callback) {
-  callback(new Error('status.spawn not implemented'));
+  const originalOnStart = configuration.onStart;
+  const g = originalOnStart
+    ? (server) => { originalOnStart(server); callback(null, server); }
+    : (server) => { callback(null, server); };
+
+  // @ts-ignore
+  distribution.local.groups.add('all', configuration, () => {});
+  // @ts-ignore
+  configuration.onStart = util.wire.createRPC(g);
+  const serialized_config = util.serialize(configuration);
+  child_process.spawn('./distribution.js', ['--config', serialized_config]);
 }
 
 /**
  * @param {Callback} callback
  */
 function stop(callback) {
-  callback(new Error('status.stop not implemented'));
+  callback(null, "closing server");
+  setTimeout(() => {
+    globalThis.distribution.node.server.close();
+  }, 1000);
 }
 
 module.exports = {get, spawn, stop, incCounts};

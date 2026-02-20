@@ -4,6 +4,8 @@
  * @typedef {import("../types.js").Config} Config
  */
 
+const node = require("../local/node.js");
+
 /**
  * NOTE: This Target is slightly different from local.all.Target
  * @typedef {Object} Target
@@ -29,9 +31,42 @@ function comm(config) {
    * @param {Callback} callback
    */
   function send(message, configuration, callback) {
-    callback(new Error('comm.send not implemented'));
+    if (!Array.isArray(message)) {
+      return callback(new Error('message must be an array'));
+    }
+    globalThis.distribution.local.groups.get(context.gid, (e, group) => {
+      if (e) {
+        return callback(e);
+      }
+      if (Object.keys(group).length === 0) {
+        return callback(null, {});
+      }
+      /** @type {Object.<string, Error>} */
+      const errors = {}
+      const values = {}
+      let count = 0;
+      for (const [sid, node] of Object.entries(group)) {
+        const remote = {
+          node: node,
+          gid: 'local',
+          service: configuration.service,
+          method: configuration.method
+        };
+        const cb = (e,v) => {
+          count++;
+          if (e) {
+            errors[sid] = e;
+          } else {
+            values[sid] = v;
+          }
+          if (count == Object.keys(group).length) {
+            return callback(errors, values);
+          }
+        }
+        globalThis.distribution.local.comm.send(message, remote, cb);
+      }
+    });
   }
-
   return {send};
 }
 

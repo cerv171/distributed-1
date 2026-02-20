@@ -9,6 +9,8 @@ const { id } = require("../util/util.js");
 
 /** @type {Object.<string, Object.<string, Node>>} */
 const groups = {};
+groups['local'] = {[id.getSID(globalThis.distribution.node.config)]: distribution.node.config};
+groups['all'] = {[id.getSID(globalThis.distribution.node.config)]: distribution.node.config};
 /**
  * @param {string} name
  * @param {Callback} callback
@@ -26,11 +28,11 @@ function get(name, callback) {
  * @param {Callback} callback
  */
 function put(config, group, callback) {
-  if (typeof config != 'string') {
-    config = config.gid;
-  }
-  groups[config] = group;
-  return callback(null, groups[config]);
+  let gid = typeof config != 'string' ? config.gid : config;
+  groups[gid] = group;
+  const services = require('../all/all.js');
+  globalThis.distribution[gid] = services.setup(typeof config == 'object' ? config : {gid: config});
+  return callback(null, groups[gid]);
 }
 
 /**
@@ -39,6 +41,7 @@ function put(config, group, callback) {
  */
 function del(name, callback) {
   delete groups[name];
+  delete globalThis.distribution[name];
   return callback(null, {});
 }
 

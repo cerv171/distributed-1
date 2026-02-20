@@ -5,15 +5,35 @@
  * @typedef {import("../types.js").Hasher} Hasher
  */
 const log = require('../util/log.js');
+const crypto = require('crypto');
 
+globalThis.distribution.toLocal = {};
 
 /**
  * @param {Function} func
  * @returns {Function} func
  */
 function createRPC(func) {
-  // Write some code...
-  console.log('used rpc');
+  const ptr = crypto.randomBytes(32).toString('hex');
+  globalThis.distribution.toLocal[ptr] = func;
+
+  function stub(...args) {
+    const cb = args.pop();
+    const remote = {
+      node: { ip: '__NODE_IP__', port: '__NODE_PORT__' },
+      gid: 'local',
+      service: 'rpc',
+      method: '__FUNC_ID__',
+    };
+    // @ts-ignore
+    return globalThis.distribution.local.comm.send(args, remote, cb);
+  }
+  const config = globalThis.distribution.node.config;
+  let stub_str = stub.toString()
+    .replace('__NODE_IP__', config.ip)
+    .replace('__NODE_PORT__', String(config.port))
+    .replace('__FUNC_ID__', ptr);
+  return new Function('return ' + stub_str)();
 }
 
 /**

@@ -144,6 +144,7 @@ function start(callback) {
         gid: gid,
         service: service,
       };
+      console.log(`Request ${gid}, ${service}, ${method}`);
       routes.get(serviceCall, (e, s) => {
         if (e) {
           res.end(util.serialize([e, null]));
