@@ -25,7 +25,7 @@ function status(config) {
   function get(configuration, callback) {
     const remote = {service: 'status', method: 'get' };
     globalThis.distribution[context.gid].comm.send([configuration], remote, (e,v) => {
-      if (configuration == 'heapTotal'){
+      if (configuration == 'heapTotal') {
         let total = 0;
         for (const [key, val] of Object.entries(v)) {
           if (typeof(val) == 'number') {
@@ -35,12 +35,12 @@ function status(config) {
           }
         }
         return callback(e, total);
-      }     
+      }
       if (configuration === 'heapUsed' || Object.keys(v).length === 0) {
         return callback(e, v);
       }
       return callback(e, Object.values(v));
-      });
+    });
   }
 
   /**
@@ -53,9 +53,8 @@ function status(config) {
       if (e) {
         return callback(e);
       }
-      //not sure what to do yet w/ result
-      callback(null, v);
-    })
+      return callback(null, v);
+    });
   }
 
   /**
@@ -68,7 +67,7 @@ function status(config) {
         return callback(e);
       }
       callback(null, v);
-    })
+    });
   }
 
   return {get, stop, spawn};

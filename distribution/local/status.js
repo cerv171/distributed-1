@@ -41,14 +41,14 @@ function spawn(configuration, callback) {
   const originalOnStart = configuration.onStart;
   const g = originalOnStart
     ? (server) => { originalOnStart(server); callback(null, server); }
-    : (server) => { callback(null, server); };
+    : (server) => { callback(null, server);};
 
   // @ts-ignore
   distribution.local.groups.add('all', configuration, () => {});
   // @ts-ignore
   configuration.onStart = util.wire.createRPC(g);
   const serialized_config = util.serialize(configuration);
-  child_process.spawn('./distribution.js', ['--config', serialized_config]);
+  const child = child_process.spawn('./distribution.js', ['--config', serialized_config]);
 }
 
 /**

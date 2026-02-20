@@ -25,11 +25,11 @@ function groups(config) {
    * @param {Callback} callback
    */
   function put(config, group, callback) {
-    const remote = {service: 'groups', method: 'put' }; 
+    const remote = {service: 'groups', method: 'put'};
     globalThis.distribution[context.gid].comm.send(
-      [config, group],
-      remote,
-      callback
+        [config, group],
+        remote,
+        callback,
     );
   }
 
@@ -38,11 +38,11 @@ function groups(config) {
    * @param {Callback} callback
    */
   function del(name, callback) {
-    const remote = {service: 'groups', method: 'del' }; 
+    const remote = {service: 'groups', method: 'del'};
     globalThis.distribution[context.gid].comm.send(
-      [name],
-      remote,
-      callback
+        [name],
+        remote,
+        callback,
     );
   }
 
@@ -51,11 +51,11 @@ function groups(config) {
    * @param {Callback} callback
    */
   function get(name, callback) {
-    const remote = {service: 'groups', method: 'get' }; 
+    const remote = {service: 'groups', method: 'get'};
     globalThis.distribution[context.gid].comm.send(
-      [name],
-      remote,
-      callback
+        [name],
+        remote,
+        callback,
     );
   }
 
@@ -65,11 +65,11 @@ function groups(config) {
    * @param {Callback} callback
    */
   function add(name, node, callback) {
-    const remote = {service: 'groups', method: 'add' }; 
+    const remote = {service: 'groups', method: 'add'};
     globalThis.distribution[context.gid].comm.send(
-      [name, node],
-      remote,
-      callback
+        [name, node],
+        remote,
+        callback,
     );
   }
 
@@ -79,11 +79,11 @@ function groups(config) {
    * @param {Callback} callback
    */
   function rem(name, node, callback) {
-    const remote = {service: 'groups', method: 'rem'}; 
+    const remote = {service: 'groups', method: 'rem'};
     globalThis.distribution[context.gid].comm.send(
-      [name, node],
-      remote,
-      callback
+        [name, node],
+        remote,
+        callback,
     );
   }
 

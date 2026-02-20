@@ -89,7 +89,7 @@ function start(callback) {
       res.end(util.serialize(new Error('only put requests')));
       return;
     }
-
+    // add periodic healthchecks
 
     /*
       The path of the http request will determine the service to be used.

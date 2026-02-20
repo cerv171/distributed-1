@@ -23,7 +23,7 @@
  * @property {(intervalID: NodeJS.Timeout, callback: Callback) => void} del
  */
 
-
+const log = globalThis.distribution.util.log;
 /**
  * @param {Config} config
  * @returns {Gossip}
@@ -41,7 +41,48 @@ function gossip(config) {
    * @param {Callback} callback
    */
   function send(payload, remote, callback) {
-    return callback(new Error('gossip.send not implemented'));
+    log(`gossip.send called, gid: ${context.gid}`);
+    globalThis.distribution.local.groups.get(payload.gid, (e, group) => {
+      if (e) {
+        return callback(e);
+      }
+      if (Object.keys(group).length == 0) {
+        return callback(Error(`empty group : ${payload.gid}`));
+      };
+      const numSend = context.subset(Object.keys(group));
+      const send = chooseRandomSlice(Object.keys(group), numSend);
+      /** @type {Object.<string, Error>} */
+      const errors = {};
+      const success = {};
+      let sent = 0;
+      for (const sid of send) {
+        globalThis.distribution.local.comm.send([payload], {...remote, node: group[sid]}, (e, v) => {
+          if (e) {
+            errors[sid] = e;
+            log(`gossip.send group error: ${e.message}`);
+          } else {
+            success[sid] = v;
+          }
+          sent +=1;
+          if (sent == Object.keys(group).length) {
+            return callback(errors, success);
+          }
+        });
+      }
+    });
+  }
+  /**
+   * 
+   * @param {Array} arr
+   * @param {number} count
+   */
+  function chooseRandomSlice(arr, count) {
+    const copy = [...arr];
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random()*(i+1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy.slice(0, count);
   }
 
   /**
@@ -50,7 +91,10 @@ function gossip(config) {
    * @param {Callback} callback
    */
   function at(period, func, callback) {
-    return callback(new Error('gossip.at not implemented'));
+    const intervalID = setInterval(() =>{
+      func();
+    }, period);
+    return callback(null, intervalID);
   }
 
   /**
@@ -58,7 +102,8 @@ function gossip(config) {
    * @param {Callback} callback
    */
   function del(intervalID, callback) {
-    return callback(new Error('gossip.del not implemented'));
+    clearInterval(intervalID);
+    return callback(null, intervalID);
   }
 
   return {send, at, del};
