@@ -31,15 +31,12 @@ function comm(config) {
    * @param {Callback} callback
    */
   function send(message, configuration, callback) {
-    if (!Array.isArray(message)) {
-      return callback(new Error('message must be an array'));
-    }
     globalThis.distribution.local.groups.get(context.gid, (e, group) => {
       if (e) {
         return callback(e);
       }
       if (Object.keys(group).length === 0) {
-        return callback(null, {});
+        return callback(new Error('no nodes in group'));
       }
       /** @type {Object.<string, Error>} */
       const errors = {}

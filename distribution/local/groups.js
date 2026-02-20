@@ -3,6 +3,7 @@
  * @typedef {import("../types.js").Callback} Callback
  * @typedef {import("../types.js").Config} Config
  * @typedef {import("../types.js").Node} Node
+ * @typedef {import("../all/all.js").GroupServices} GroupService
  */
 
 const { id } = require("../util/util.js");
@@ -29,9 +30,10 @@ function get(name, callback) {
  */
 function put(config, group, callback) {
   let gid = typeof config != 'string' ? config.gid : config;
+  globalThis.distribution[gid] = {};
+  const {setup} = require('../all/all.js');
+  globalThis.distribution[gid] = setup(typeof config === 'object' ? config : {gid: config});
   groups[gid] = group;
-  const services = require('../all/all.js');
-  globalThis.distribution[gid] = services.setup(typeof config == 'object' ? config : {gid: config});
   return callback(null, groups[gid]);
 }
 
@@ -40,9 +42,13 @@ function put(config, group, callback) {
  * @param {Callback} callback
  */
 function del(name, callback) {
+  if (!(name in groups)) {
+    return callback(Error(`del name ${name}, but name not in groups`));
+  }
+  const old_groups = groups[name];
   delete groups[name];
   delete globalThis.distribution[name];
-  return callback(null, {});
+  return callback(null, old_groups);
 }
 
 /**
@@ -52,10 +58,11 @@ function del(name, callback) {
  */
 function add(name, node, callback) {
   if (!(name in groups)) {
-    groups[name] = {};
+    return callback(new Error(`missing group ${name}`))
   }
   groups[name][id.getSID(node)] = node;
-  return callback(null ,node);
+  if (callback)
+    callback(null, groups[name]);
 };
 
 /**

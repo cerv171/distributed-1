@@ -24,20 +24,23 @@ function status(config) {
    */
   function get(configuration, callback) {
     const remote = {service: 'status', method: 'get' };
-    globalThis.distribution[context.gid].comm.send(configuration, remote, (e,v) => {
-      if (e) {
-        return callback(e);
-      }
-      let total = 0;
-      for (const [key, val] of Object.entries(v)) {
-        if (typeof(val) == 'number') {
-          total += val;
-        } else {
-          console.log(`bad status ${key}, ${val}`);
+    globalThis.distribution[context.gid].comm.send([configuration], remote, (e,v) => {
+      if (configuration == 'heapTotal'){
+        let total = 0;
+        for (const [key, val] of Object.entries(v)) {
+          if (typeof(val) == 'number') {
+            total += val;
+          } else {
+            console.log(`bad status ${key}, ${val}`);
+          }
         }
+        return callback(e, total);
+      }     
+      if (configuration === 'heapUsed' || Object.keys(v).length === 0) {
+        return callback(e, v);
       }
-      callback(null, total);
-    });
+      return callback(e, Object.values(v));
+      });
   }
 
   /**
@@ -46,7 +49,7 @@ function status(config) {
    */
   function spawn(configuration, callback) {
     const remote = {service: 'status', method: 'spawn'};
-    globalThis.distribution[context.gid].comm.send(configuration, remote, (e, v) => {
+    globalThis.distribution[context.gid].comm.send([configuration], remote, (e, v) => {
       if (e) {
         return callback(e);
       }

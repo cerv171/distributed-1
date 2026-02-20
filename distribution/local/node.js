@@ -27,7 +27,6 @@ function setNodeConfig() {
   if (typeof args.port === 'string' || typeof args.port === 'number') {
     maybePort = parseInt(String(args.port), 10);
   }
-
   if (args.help === true || args.h === true) {
     console.log('Node usage:');
     console.log('  --ip <ip address>      The ip address to bind the node to');
@@ -141,10 +140,9 @@ function start(callback) {
         return;
       }
       const serviceCall = {
-        gid: gid,
+        gid: gid ? gid : 'local',
         service: service,
       };
-      console.log(`Request ${gid}, ${service}, ${method}`);
       routes.get(serviceCall, (e, s) => {
         if (e) {
           res.end(util.serialize([e, null]));

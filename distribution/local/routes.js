@@ -11,12 +11,12 @@ const routes = {};
  */
 function get(configuration, callback) {
   let service;
-  let gid;
+  let gid = 'local';
   if (typeof configuration == 'string') {
     service = configuration;
-  } else if (configuration && typeof configuration == 'object' && configuration.service && configuration.gid) {
+  } else if (configuration && typeof configuration == 'object' && configuration.service) {
     service = configuration.service;
-    gid = configuration.gid;
+    gid = configuration.gid || 'local';
   } else {
     return callback(new Error('invalid config'));
   }
