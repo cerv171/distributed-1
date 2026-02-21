@@ -181,7 +181,7 @@ I'd say that RPC's purpose is to allow another node (think another person) to te
 
 
 
-My implementation comprises around 400 added lines of code over the previous implementation. I implemented all the components for node group communication including broadcasting messages to all nodes in a group in all.comm.js, gossip protocol in all.gossip.js and local.gossip.js. I also implemented local node spawning and stopping alongside their group equivalents. The main challenge for me was setting up gossip protocol and figuring out its implementation. 
+My implementation comprises around 300 added lines of code over the previous implementation. I implemented all the components for node group communication including broadcasting messages to all nodes in a group in all.comm.js, gossip protocol in all.gossip.js and local.gossip.js. I also implemented local node spawning and stopping alongside their group equivalents. The main challenge for me was setting up gossip protocol and figuring out its implementation, as well as setting up logging and tracking execution on different nodes.
 
 
 ## Correctness & Performance Characterization
@@ -192,8 +192,8 @@ My implementation comprises around 400 added lines of code over the previous imp
 I wrote tests in m3.student.test.js that range from first testing basic functionality - putting, removing, getting from groups -- to then testing my all.groups functionaity, adding groups to all nodes within a group. I then ran some cases for gossip: first a basic gossip run with ten nodes and then testing to ensure that our expected messages from gossip protocol are less when I place differing, smaller representations of the group from some of the nodes in the group. Finally, I also tested that errors properly propagate in gossip to the caller, like when the group is not registered.
 
 *Performance* -- spawn times (all students) and gossip (lab/ec-only).
-Gossip: 100 nodes w/ a propagation of log(100) from each node takes 150 ms to propagate to all nodes, about 1.5 ms/node
-Spawning: 100 nodes spawned took 931 ms = 9.3 ms / node
+Gossip: 100 nodes w/ a propagation of log(100) from each node takes 150 ms to propagate to all nodes, about 1.5 ms/node (locally), 10 nodes took 111ms about 11.1 ms./node (aws)
+Spawning: 100 nodes spawned took 931 ms = 9.3 ms / node (locally), 10 nodes spawned took 435 ms = 43.5 ms / node (aws)
 
 
 ## Key Feature
