@@ -21,7 +21,22 @@ function normalize(func, args) {
   return normalizedArgs;
 }
 
+/**
+ * 
+ * @param {Array} arr
+ * @param {number} count
+ */
+function chooseRandomSlice(arr, count) {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy.slice(0, count);
+}
+
 module.exports = {
+  chooseRandomSlice: chooseRandomSlice,
   normalize: normalize,
   serialize: serialization.serialize,
   deserialize: serialization.deserialize,

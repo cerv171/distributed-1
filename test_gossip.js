@@ -1,6 +1,8 @@
 const distribution = require('./distribution.js')();
 const log = distribution.util.log;
 log('starting log');
+let start;
+let end;
 distribution.node.start(() => {
   const NODE_COUNT = 100;
   const allNodes = [];
@@ -13,7 +15,7 @@ distribution.node.start(() => {
   groupData[id.getSID(distribution.node.config)] = distribution.node.config;
   const groupConfig = {
     gid: 'testGroup',
-    subset: (lst) => Math.ceil(Math.log(100) * 2),
+    subset: (lst) => Math.ceil(Math.log(lst.length)),
   };
   for (const node of allNodes) {
     distribution.local.status.spawn(node, (e, v) => {
@@ -25,22 +27,25 @@ distribution.node.start(() => {
         const counterService = {
           count: (callback) => {
             n++;
-            console.log(`counter service n: ${n}`);
-            callback(n);
+            if (n >= NODE_COUNT) {
+              end = Date.now();
+              console.log(`took ${(end - start)} ms`);
+            }
+            return callback(null, n);
           },
         };
-        const payload = {message: [], remote: {node: distribution.node.config, service: 'counter', method: 'count'}, mid: [1], gid: 'testGroup'};
-        const remote = {service: 'gossip', method: 'recv'};
         distribution.local.routes.put(counterService, 'counter', (e, v) => {
           distribution.local.groups.put(groupConfig, groupData, (e, v) => {
             distribution.testGroup.groups.put(groupConfig, groupData, (e, v) => {
-              console.log('groups.put errors:', e);
-              distribution.testGroup.gossip.send(payload, remote, (e, v) => {
+              start = Date.now();
+              const message = [[], {node: distribution.node.config, service: 'counter', method: 'count'}];
+              const remote = {service: 'comm', method: 'send'};
+              distribution.testGroup.gossip.send(message, remote, (e, v) => {
                 console.log(v);
               });
               setTimeout(() => {
-                console.log(`reached: ${n} nodes`);
-              }, 3000);
+                console.log(`reached: ${n} / ${NODE_COUNT} nodes`);
+              }, 5000);
             });
           });
         });

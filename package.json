@@ -95,22 +95,22 @@
     },
     {
       "milestone": "M3",
-      "hours": 999,
-      "loc": 999,
+      "hours": 10,
+      "loc": 500,
       "dev": {
-        "cpu-no": 999,
-        "mem-gb": 999,
-        "ssd-gb": 999
+        "cpu-no": 9,
+        "mem-gb": 48,
+        "ssd-gb": 500
       },
       "throughput": {
-        "dev": [],
+        "dev": [0,107, 0.6666],
         "aws": []
       },
       "latency": {
-        "dev": [],
+        "dev": [9.3, 1.5],
         "aws": []
       },
-      "dloc": -99
+      "dloc": 2000
     },
     {
       "milestone": "M4",

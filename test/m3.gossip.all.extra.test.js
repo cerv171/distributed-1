@@ -2,9 +2,7 @@ require('../distribution.js')();
 require('./helpers/sync-guard');
 const distribution = globalThis.distribution;
 const id = distribution.util.id;
-
 jest.spyOn(process, 'exit').mockImplementation((n) => { });
-
 // This group is used for testing most of the functionality
 const mygroupGroup = {};
 

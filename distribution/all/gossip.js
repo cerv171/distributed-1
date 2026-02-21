@@ -15,14 +15,18 @@
  * @property {any} message
  * @property {string} mid
  * @property {string} gid
+ * @property {function} subset
  *
- *
+ *@typedef {any[]} message
+ * 
  * @typedef {Object} Gossip
  * @property {(payload: Payload, remote: Remote, callback: Callback) => void} send
  * @property {(perod: number, func: () => void, callback: Callback) => void} at
  * @property {(intervalID: NodeJS.Timeout, callback: Callback) => void} del
  */
 
+const { recv } = require("../local/gossip.js");
+const util = globalThis.distribution.util;
 const log = globalThis.distribution.util.log;
 /**
  * @param {Config} config
@@ -35,54 +39,26 @@ function gossip(config) {
     return Math.ceil(Math.log(lst.length));
   };
 
+  // construct payload on its own
+
   /**
-   * @param {Payload} payload
+   * @param {message} message
    * @param {Remote} remote
    * @param {Callback} callback
    */
-  function send(payload, remote, callback) {
+  function send(message, remote, callback) {
+    log('-----------------------------');
     log(`gossip.send called, gid: ${context.gid}`);
-    globalThis.distribution.local.groups.get(payload.gid, (e, group) => {
-      if (e) {
-        return callback(e);
-      }
-      if (Object.keys(group).length == 0) {
-        return callback(Error(`empty group : ${payload.gid}`));
-      };
-      const numSend = context.subset(Object.keys(group));
-      const send = chooseRandomSlice(Object.keys(group), numSend);
-      /** @type {Object.<string, Error>} */
-      const errors = {};
-      const success = {};
-      let sent = 0;
-      for (const sid of send) {
-        globalThis.distribution.local.comm.send([payload], {...remote, node: group[sid]}, (e, v) => {
-          if (e) {
-            errors[sid] = e;
-            log(`gossip.send group error: ${e.message}`);
-          } else {
-            success[sid] = v;
-          }
-          sent +=1;
-          if (sent == Object.keys(group).length) {
-            return callback(errors, success);
-          }
-        });
-      }
+    const payload = {
+      remote: remote,
+      message: message,
+      mid: Math.random().toString(36).slice(5),
+      gid: context.gid,
+      subset: context.subset,
+    };
+    globalThis.distribution.local.gossip.recv(payload, (e, v) => {
+      return callback(e, v);
     });
-  }
-  /**
-   * 
-   * @param {Array} arr
-   * @param {number} count
-   */
-  function chooseRandomSlice(arr, count) {
-    const copy = [...arr];
-    for (let i = copy.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random()*(i+1));
-      [copy[i], copy[j]] = [copy[j], copy[i]];
-    }
-    return copy.slice(0, count);
   }
 
   /**

@@ -47,15 +47,16 @@ function status(config) {
    * @param {Node} configuration
    * @param {Callback} callback
    */
-  function spawn(configuration, callback) {
-    const remote = {service: 'status', method: 'spawn'};
-    globalThis.distribution[context.gid].comm.send([configuration], remote, (e, v) => {
-      if (e) {
-        return callback(e);
-      }
-      return callback(null, v);
+function spawn(configuration, callback) {
+  globalThis.distribution.local.status.spawn(configuration, (e, v) => {
+    if (e) return callback(e);
+    globalThis.distribution.local.groups.add(context.gid, configuration, (e2, v2) => {
+      globalThis.distribution[context.gid].groups.add(context.gid, configuration, (e3, v3) => {
+        callback(null, configuration);
+      });
     });
-  }
+  });
+}
 
   /**
    * @param {Callback} callback

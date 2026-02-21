@@ -53,7 +53,7 @@ function send(message, remote, callback) {
     });
   });
   req.on('error', (e) => {
-    return callback(e);
+    return callback(new Error(e.message));
   });
   req.end(util.serialize(message));
 }

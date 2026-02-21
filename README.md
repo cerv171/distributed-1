@@ -170,3 +170,34 @@ My implementation comprises 4 software components, totaling 300 lines of code. S
 > How would you explain the implementation of `createRPC` to someone who has no background in computer science — i.e., with the minimum jargon possible?
 
 I'd say that RPC's purpose is to allow another node (think another person) to tell you to do a task that they need done but they don't want to do themself. createRPC does this by creating an instruction (stub) that you can send to another person that tells them how to get you to do the task instead of them. The other person can then invoke that instruction whenever they want, and it will cause you to do the task for them and they can retrieve the result -- importantly your friend doesn't need to know how to do the task for it to be done, they just need to call your instruction.
+
+
+# M3: Node Groups & Gossip Protocols
+
+
+## Summary
+
+> Summarize your implementation, including key challenges you encountered. Remember to update the `report` section of the `package.json` file with the total number of hours it took you to complete each task of M3 (`hours`) and the lines of code per task.
+
+
+
+My implementation comprises around 400 added lines of code over the previous implementation. I implemented all the components for node group communication including broadcasting messages to all nodes in a group in all.comm.js, gossip protocol in all.gossip.js and local.gossip.js. I also implemented local node spawning and stopping alongside their group equivalents. The main challenge for me was setting up gossip protocol and figuring out its implementation. 
+
+
+## Correctness & Performance Characterization
+
+
+
+*Correctness* -- number of tests and time they take.
+I wrote tests in m3.student.test.js that range from first testing basic functionality - putting, removing, getting from groups -- to then testing my all.groups functionaity, adding groups to all nodes within a group. I then ran some cases for gossip: first a basic gossip run with ten nodes and then testing to ensure that our expected messages from gossip protocol are less when I place differing, smaller representations of the group from some of the nodes in the group. Finally, I also tested that errors properly propagate in gossip to the caller, like when the group is not registered.
+
+*Performance* -- spawn times (all students) and gossip (lab/ec-only).
+Gossip: 100 nodes w/ a propagation of log(100) from each node takes 150 ms to propagate to all nodes, about 1.5 ms/node
+Spawning: 100 nodes spawned took 931 ms = 9.3 ms / node
+
+
+## Key Feature
+
+> What is the point of having a gossip protocol? Why doesn't a node just send the message to _all_ other nodes in its group?
+
+A gossip protocol allows us to send data with eventual consistency without much load on individual nodes or the network. If we had a really large number of nodes, sending one message from one node to all the other nodes in its group will put a large amount of load on that node and potentially stop it from being able to do other tasks. Gossip protocol also has high tolerance, its randomness and method allows it to reach other nodes through many different paths, overcoming dead nodes. Furthermore, with gossip single nodes only need to know of a few neighbors in their network and not track all other nodes.

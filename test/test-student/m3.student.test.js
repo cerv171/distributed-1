@@ -117,19 +117,13 @@ test('(1 pts) student test', (done) => { // gossip test basic functionality
     gid: 'gossipTest',
     subset: (lst) => Math.ceil(Math.log(lst.length) * 2),
   };
-  const mid = 67;
-  const payload = {
-    message: [],
-    remote: {node: distribution.node.config, service: 'counter', method: 'count'},
-    mid: mid,
-    gid: 'gossipTest',
-  };
-  const remote = {service: 'gossip', method: 'recv'};
+  const message = [[], {node: distribution.node.config, service: 'counter', method: 'count'}];
+  const remote = {service: 'comm', method: 'send'};
 
   distribution.local.routes.put(counterService, 'counter', (e, v) => {
     distribution.local.groups.put(gossipConfig, gossipGroup, (e, v) => {
       distribution.gossipTest.groups.put(gossipConfig, gossipGroup, (e, v) => {
-        distribution.gossipTest.gossip.send(payload, remote, (e, v) => {});
+        distribution.gossipTest.gossip.send(message, remote, (e, v) => {});
         setTimeout(() => {
           try {
             expect(n).toBeGreaterThanOrEqual(NODE_COUNT - 1);
@@ -163,20 +157,14 @@ test('(1 pts) student test', (done) => { // gossip more functionality, groups wi
     gid: 'gossipTestSep',
     subset: (lst) => Math.ceil(Math.log(lst.length) * 2),
   };
-  const mid = 67;
-  const payload = {
-    message: [],
-    remote: {node: distribution.node.config, service: 'counter', method: 'count'},
-    mid: mid,
-    gid: 'gossipTest',
-  };
-  const remote = {service: 'gossip', method: 'recv'};
+  const message = [[], {node: distribution.node.config, service: 'counter', method: 'count'}];
+  const remote = {service: 'comm', method: 'send'};
   distribution.local.routes.put(counterService, 'counter', (e, v) => {
     distribution.local.groups.put(gossipConfig, gossipGroup, (e, v) => {
       distribution.local.groups.put(gossipConfigSeparate, gossipGroupSeparate, (e, v) => {
         distribution.gossipTest.groups.put(gossipConfig, gossipGroup, (e, v) => {
           distribution.gossipTestSep.groups.put(gossipConfig, gossipGroupSeparate, (e, v) => {
-            distribution.gossipTest.gossip.send(payload, remote, (e, v) => {});
+            distribution.gossipTestSep.gossip.send(message, remote, (e, v) => {});
             setTimeout(() => {
               try {
                 expect(n).toBeLessThan(NODE_COUNT - 1);

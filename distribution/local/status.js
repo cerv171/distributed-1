@@ -38,27 +38,38 @@ function incCounts() {
  * @param {Callback} callback
  */
 function spawn(configuration, callback) {
-  const originalOnStart = configuration.onStart;
-  const g = originalOnStart
-    ? (server) => { originalOnStart(server); callback(null, server); }
-    : (server) => { callback(null, server);};
+  if (!configuration || !configuration.port || !configuration.port || configuration.port == 0) {
+    return callback(Error('invalid spawn config'));
+  }
+  distribution.local.groups.get('all', (e, group) => {
+    const sid = util.id.getSID(configuration);
+    if (group && sid in group) {
+      return callback(new Error(`node on ${configuration.port} already exists`));
+    }
+    const originalOnStart = configuration.onStart;
+    const g = originalOnStart ?
+      (server) => {
+        originalOnStart(server); callback(null, server);
+      } :
+      (server) => {
+        callback(null, server);
+      };
 
-  // @ts-ignore
-  distribution.local.groups.add('all', configuration, () => {});
-  // @ts-ignore
-  configuration.onStart = util.wire.createRPC(g);
-  const serialized_config = util.serialize(configuration);
-  const child = child_process.spawn('./distribution.js', ['--config', serialized_config]);
+    // @ts-ignore
+    distribution.local.groups.add('all', configuration, () => {});
+    // @ts-ignore
+    configuration.onStart = util.wire.createRPC(g);
+    const serialized_config = util.serialize(configuration);
+    const child = child_process.spawn('./distribution.js', ['--config', serialized_config]);
+  });
 }
 
 /**
  * @param {Callback} callback
  */
 function stop(callback) {
-  callback(null, "closing server");
-  setTimeout(() => {
-    globalThis.distribution.node.server.close();
-  }, 1000);
+  callback(null, globalThis.distribution.node.config);
+  globalThis.distribution.node.server.close();
 }
 
 module.exports = {get, spawn, stop, incCounts};
