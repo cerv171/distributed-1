@@ -4,7 +4,7 @@ log('starting log');
 let start;
 let end;
 distribution.node.start(() => {
-  const NODE_COUNT = 100;
+  const NODE_COUNT = 10;
   const allNodes = [];
   for (let i = 0; i < NODE_COUNT; i++) {
     allNodes.push({ip: '127.0.0.1', port: 8080+i});
