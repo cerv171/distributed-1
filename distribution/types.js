@@ -21,6 +21,12 @@
  * @property {?string} gid
  * @property {Hasher} [hash]
  * @property {Sampler} [subset]
+ *
+ * @typedef {Object} StoreConfig
+ * @property {string | null} key
+ * @property {string} gid
+ *
+ * @typedef {StoreConfig | string | null} SimpleConfig
  */
 
 module.exports = {};

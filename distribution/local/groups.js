@@ -32,7 +32,7 @@ function put(config, group, callback) {
   let gid = typeof config != 'string' ? config.gid : config;
   globalThis.distribution[gid] = {};
   const {setup} = require('../all/all.js');
-  globalThis.distribution[gid] = setup(typeof config === 'object' ? config : {gid: config});
+  globalThis.distribution[gid] = setup(typeof config === 'object' ? config : {gid: gid});
   groups[gid] = group;
   return callback(null, groups[gid]);
 }
@@ -58,11 +58,10 @@ function del(name, callback) {
  */
 function add(name, node, callback) {
   if (!(name in groups)) {
-    return callback(new Error(`missing group ${name}`))
+    return callback(new Error(`missing group ${name}`));
   }
   groups[name][id.getSID(node)] = node;
-  if (callback)
-    callback(null, groups[name]);
+  if (callback) return callback(null, groups[name]);
 };
 
 /**

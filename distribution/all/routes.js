@@ -22,11 +22,11 @@ function routes(config) {
    * @param {Callback} callback
    */
   function put(service, name, callback) {
-    const remote = {service: 'routes', method: 'put' }; 
+    const remote = {service: 'routes', method: 'put'};
     globalThis.distribution[context.gid].comm.send(
-      [service, name],
-      remote,
-      callback
+        [service, name],
+        remote,
+        callback,
     );
   }
 
@@ -35,11 +35,11 @@ function routes(config) {
    * @param {Callback} callback
    */
   function rem(configuration, callback) {
-    const remote = {service: 'routes', method: 'rem'}; 
+    const remote = {service: 'routes', method: 'rem'};
     globalThis.distribution[context.gid].comm.send(
-      [configuration],
-      remote,
-      callback
+        [configuration],
+        remote,
+        callback,
     );
   }
   return {put, rem};

@@ -36,7 +36,7 @@ function recv(payload, callback) {
           } else {
             log(v);
           }
-          log(`${globalThis.distribution.node.config.ip} : sent increment`);
+          // log(`${globalThis.distribution.node.config.ip} : sent increment`);
           globalThis.distribution.local.groups.get(payload.gid, (e, group) => {
             if (e) {
               return callback(e);

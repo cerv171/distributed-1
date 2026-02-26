@@ -14,7 +14,11 @@
 - Use absolute paths to make sure they are agnostic to where your code is running from!
   Use the `path` module for that.
 */
-
+const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
+const util = globalThis.distribution.util;
+const storePath = path.join(__dirname, '..', '..', 'store');
 
 /**
  * @param {any} state
@@ -22,7 +26,23 @@
  * @param {Callback} callback
  */
 function put(state, configuration, callback) {
-  return callback(new Error('store.put not implemented'));
+  let group;
+  let key;
+  if (typeof(configuration) == 'string' || configuration == null) {
+    group = 'local';
+    key = configuration == null ? util.id.getID(state) : configuration;
+  } else {
+    if (typeof(configuration) == 'object' && configuration.gid && configuration.key) {
+      group = configuration.gid;
+      key = configuration == null ? util.id.getID(state) : configuration.key;
+    } else {
+      return callback(Error('store put must be a SimpleConfig type or string'));
+    }
+  }
+  const filePath = path.join(storePath, `${util.id.getNID(globalThis.distribution.node.config)}/${group}/${key}.txt`);
+  fs.mkdirSync(path.dirname(filePath), {recursive: true});
+  fs.writeFileSync(filePath, util.serialize(state));
+  return callback(null, state);
 }
 
 /**
@@ -30,7 +50,32 @@ function put(state, configuration, callback) {
  * @param {Callback} callback
  */
 function get(configuration, callback) {
-  return callback(new Error('store.get not implemented'));
+  let group;
+  let key;
+  if (typeof(configuration) == 'string' || configuration == null) {
+    group = 'local';
+    key = configuration;
+  } else {
+    if (typeof(configuration) == 'object' && configuration.gid) {
+      group = configuration.gid;
+      key = configuration.key;
+    } else {
+      return callback(Error('store get must be a SimpleConfig type or string or null'));
+    }
+  }
+  if (key == null) {
+    const dirPath = path.join(storePath, `${util.id.getNID(globalThis.distribution.node.config)}/${group}`);
+    if (!fs.existsSync(dirPath)) {
+      return callback(Error(`group ${group} does not exist`));
+    }
+    return callback(null, fs.readdirSync(dirPath).map((filename) => filename.replace('.txt', '')));
+  } else {
+    const filePath = path.join(storePath, `${util.id.getNID(globalThis.distribution.node.config)}/${group}/${key}.txt`);
+    if (!fs.existsSync(filePath)) {
+      return callback(Error(`key ${key} does not exist in group ${group}`));
+    }
+    return callback(null, util.deserialize(fs.readFileSync(filePath, 'utf8')));
+  }
 }
 
 /**
@@ -38,7 +83,27 @@ function get(configuration, callback) {
  * @param {Callback} callback
  */
 function del(configuration, callback) {
-  return callback(new Error('store.del not implemented'));
+  let group;
+  let key;
+  if (typeof(configuration) == 'string') {
+    group = 'local';
+    /** @type {string | null} */
+    key = configuration;
+  } else {
+    if (typeof(configuration) == 'object' && configuration.gid && configuration.key) {
+      group = configuration.gid;
+      key = /** @type {string | null} */ (configuration.key);
+    } else {
+      return callback(Error('del put must be a SimpleConfig type or string'));
+    }
+  }
+  const filePath = path.join(storePath, `${util.id.getNID(globalThis.distribution.node.config)}/${group}/${key}.txt`);
+  if (!fs.existsSync(filePath)) {
+    return callback(Error(`storage: key ${key} does not exist in group ${group}`));
+  }
+  const oldVal = util.deserialize(fs.readFileSync(filePath, 'utf8'));
+  fs.unlinkSync(filePath);
+  return callback(null, oldVal);
 }
 
 /**

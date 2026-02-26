@@ -20,7 +20,7 @@ function createRPC(func) {
   function stub(...args) {
     const cb = args.pop();
     const remote = {
-      node: { ip: '__NODE_IP__', port: '__NODE_PORT__' },
+      node: {ip: '__NODE_IP__', port: '__NODE_PORT__'},
       gid: 'local',
       service: 'rpc',
       method: '__FUNC_ID__',

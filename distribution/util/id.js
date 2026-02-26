@@ -9,6 +9,7 @@
 
 const assert = require('assert');
 const crypto = require('crypto');
+const { id } = require("./util.js");
 
 /**
  * @param {any} obj
@@ -72,10 +73,30 @@ const naiveHash = (kid, nids) => {
 
 /** @type { Hasher } */
 const consistentHash = (kid, nids) => {
+  const kidNum = {num: idToNum(kid), isNid: false};
+  const nidNum = nids.map((nid) => ({nid, num: idToNum(nid), isNid: true}));
+  const space = [kidNum, ...nidNum];
+  space.sort((a, b) => {
+    if (a.num < b.num) return -1;
+    if (a.num > b.num) return 1;
+    return 0;
+  });
+  const i = space.findIndex((item) => !item.isNid);
+  return space[(i + 1) % space.length].nid;
 };
 
 /** @type { Hasher } */
 const rendezvousHash = (kid, nids) => {
+  const space = nids.map((nid) => ({nid, val: idToNum(getID(kid+nid))}));
+  let maxNid = '';
+  let maxVal = BigInt(-1);
+  for (const elm of space) {
+    if (elm.val > maxVal) {
+      maxVal = elm.val;
+      maxNid = elm.nid;
+    }
+  }
+  return maxNid;
 };
 
 module.exports = {

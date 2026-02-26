@@ -66,6 +66,7 @@ test('(1 pts) all.store.put/get(jcarb)', (done) => {
   const key = 'jcarbmpg';
 
   distribution.mygroup.store.put(user, key, (e, v) => {
+    console.log(e, v);
     distribution.mygroup.store.get(key, (e, v) => {
       try {
         expect(e).toBeFalsy();
