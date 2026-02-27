@@ -11,8 +11,6 @@ require('../helpers/sync-guard');
 const distribution = globalThis.distribution;
 const id = distribution.util.id;
 
-jest.spyOn(process, 'exit').mockImplementation((n) => { });
-
 const mygroupGroup = {};
 
 const n1 = {ip: '127.0.0.1', port: 7110};
@@ -21,7 +19,7 @@ const n3 = {ip: '127.0.0.1', port: 7112};
 
 test('(1 pts) student test', (done) => {
   // get null on a group with no objects returns empty list
-  distribution.studentgroup.mem.get(null, (e, v) => {
+  distribution.group.mem.get(null, (e, v) => {
     try {
       expect(e).toEqual({});
       expect(v).toEqual([]);
@@ -37,7 +35,7 @@ test('(1 pts) student test', (done) => {
   const user = {first: 'Colin', last: 'Test'};
   const key = 'colindeltest';
 
-  distribution.studentgroup.store.put(user, key, (e, v) => {
+  distribution.group.store.put(user, key, (e, v) => {
     try {
       expect(e).toBeFalsy();
       expect(v).toEqual(user);
@@ -45,7 +43,7 @@ test('(1 pts) student test', (done) => {
       done(error);
       return;
     }
-    distribution.studentgroup.store.del(key, (e, v) => {
+    distribution.group.store.del(key, (e, v) => {
       try {
         expect(e).toBeFalsy();
         expect(v).toEqual(user);
@@ -53,7 +51,7 @@ test('(1 pts) student test', (done) => {
         done(error);
         return;
       }
-      distribution.studentgroup.store.del(key, (e, v) => {
+      distribution.group.store.del(key, (e, v) => {
         try {
           expect(e).toBeTruthy();
           expect(e).toBeInstanceOf(Error);
@@ -71,7 +69,7 @@ test('(1 pts) student test', (done) => {
   const user = {first: 'Max', last: 'Smith'};
   const key = 'maxsmith';
 
-  distribution.studentgroup.mem.put(user, key, (e, v) => {
+  distribution.group.mem.put(user, key, (e, v) => {
     try {
       expect(e).toBeFalsy();
       expect(v).toEqual(user);
@@ -79,7 +77,7 @@ test('(1 pts) student test', (done) => {
       done(error);
       return;
     }
-    distribution.studentgroup.mem.get(key, (e, v) => {
+    distribution.group.mem.get(key, (e, v) => {
       try {
         expect(e).toBeFalsy();
         expect(v).toEqual(user);
@@ -87,7 +85,7 @@ test('(1 pts) student test', (done) => {
         done(error);
         return;
       }
-      distribution.studentgroup.mem.del(key, (e, v) => {
+      distribution.group.mem.del(key, (e, v) => {
         try {
           expect(e).toBeFalsy();
           expect(v).toEqual(user);
@@ -95,7 +93,7 @@ test('(1 pts) student test', (done) => {
           done(error);
           return;
         }
-        distribution.studentgroup.mem.get(key, (e, v) => {
+        distribution.group.mem.get(key, (e, v) => {
           try {
             expect(e).toBeTruthy();
             expect(e).toBeInstanceOf(Error);
@@ -115,7 +113,7 @@ test('(1 pts) student test', (done) => {
   const user2 = {first: 'Loe', last: 'Updated'};
   const key = 'loeoverwrite';
 
-  distribution.studentgroup.store.put(user1, key, (e, v) => {
+  distribution.group.store.put(user1, key, (e, v) => {
     try {
       expect(e).toBeFalsy();
       expect(v).toEqual(user1);
@@ -123,7 +121,7 @@ test('(1 pts) student test', (done) => {
       done(error);
       return;
     }
-    distribution.studentgroup.store.put(user2, key, (e, v) => {
+    distribution.group.store.put(user2, key, (e, v) => {
       try {
         expect(e).toBeFalsy();
         expect(v).toEqual(user2);
@@ -131,7 +129,7 @@ test('(1 pts) student test', (done) => {
         done(error);
         return;
       }
-      distribution.studentgroup.store.get(key, (e, v) => {
+      distribution.group.store.get(key, (e, v) => {
         try {
           expect(e).toBeFalsy();
           expect(v).toEqual(user2);
@@ -147,22 +145,22 @@ test('(1 pts) student test', (done) => {
 test('(1 pts) student test', (done) => {
   // get null returns all keys after multiple puts across mem
   const items = [
-    {key: 'apple', val: {fruit: 'apple', color: 'red'}},
-    {key: 'banana', val: {fruit: 'banana', color: 'yellow'}},
-    {key: 'cherry', val: {fruit: 'cherry', color: 'red'}},
-    {key: 'date', val: {fruit: 'date', color: 'brown'}},
+    {key: 'a', val: 'a'},
+    {key: 'b', val: 'b'},
+    {key: 'c', val: 'c'},
+    {key: 'd', val: 'd'},
   ];
 
   let putDone = 0;
   for (const item of items) {
-    distribution.studentgroup.mem.put(item.val, item.key, (e, v) => {
+    distribution.group.mem.put(item.val, item.key, (e, v) => {
       if (e) {
         done(e);
         return;
       }
       putDone++;
       if (putDone === items.length) {
-        distribution.studentgroup.mem.get(null, (e, v) => {
+        distribution.group.mem.get(null, (e, v) => {
           try {
             expect(e).toEqual({});
             const expectedKeys = items.map((i) => i.key);
@@ -180,11 +178,6 @@ test('(1 pts) student test', (done) => {
 
 beforeAll((done) => {
   const remote = {service: 'status', method: 'stop'};
-
-  const fs = require('fs');
-  const path = require('path');
-  fs.rmSync(path.join(__dirname, '../../store'), {recursive: true, force: true});
-  fs.mkdirSync(path.join(__dirname, '../../store'));
 
   remote.node = n1;
   distribution.local.comm.send([], remote, (e, v) => {
@@ -230,13 +223,13 @@ beforeAll((done) => {
   }
 
   function groupInstantiation() {
-    const studentConfig = {gid: 'studentgroup'};
-    distribution.local.groups.put(studentConfig, mygroupGroup, (e, v) => {
+    const config = {gid: 'group'};
+    distribution.local.groups.put(config, mygroupGroup, (e, v) => {
       if (e && Object.keys(e).length > 0) {
         done(e);
         return;
       }
-      distribution.studentgroup.groups.put(studentConfig, mygroupGroup, (e, v) => {
+      distribution.group.groups.put(config, mygroupGroup, (e, v) => {
         if (e && Object.keys(e).length > 0) {
           done(e);
           return;

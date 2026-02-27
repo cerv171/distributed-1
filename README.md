@@ -201,3 +201,30 @@ Spawning: 100 nodes spawned took 931 ms = 9.3 ms / node (locally), 10 nodes spaw
 > What is the point of having a gossip protocol? Why doesn't a node just send the message to _all_ other nodes in its group?
 
 A gossip protocol allows us to send data with eventual consistency without much load on individual nodes or the network. If we had a really large number of nodes, sending one message from one node to all the other nodes in its group will put a large amount of load on that node and potentially stop it from being able to do other tasks. Gossip protocol also has high tolerance, its randomness and method allows it to reach other nodes through many different paths, overcoming dead nodes. Furthermore, with gossip single nodes only need to know of a few neighbors in their network and not track all other nodes.
+
+# M4: Distributed Storage
+
+
+## Summary
+
+I added features for local memory and storage on nodes as well as a distributed storage system over a group of nodes. Groups use different hashing schemas like consistent hashing or rendezvous hashing to determine which node data is stored on. Furthermore, I implemented dyanmic reconfiguration of node groups, redistributing keys when changes are detected in the amount of nodes in a node group at a custom timer. One of the main challenges for me was reasoning through how reconf works and testing to ensure that my implementation worked properly.
+
+
+
+
+
+
+## Correctness & Performance Characterization
+
+> Describe how you characterized the correctness and performance of your implementation
+
+I characterized correctness with 5 tests that cover basic distributed memory and storage functions - put/get/del and also cases like ensuring del/del resulted in an error and del/get would error, overriding puts is successful. I also extensively tested that get with a null parameter worked in different edge cases like with an empty key set, after putting multiple times. 
+
+To characterize performance, I ran ran the distributed store on three aws nodes, and put and retrieved 1000 random objects. I found a throughput of 3200 objects / second for put, with a average latency of 180 ms/object. For get, I found a throughput of 48930 objects / second and an average latency of 102 ms.
+
+
+## Key Feature
+
+> Why is the `reconf` method designed to first identify all the keys to be relocated and then relocate individual objects instead of fetching all the objects immediately and then pushing them to their corresponding locations?
+
+The objects could take up a lot of memory and fetching all objects at once could bottleneck the node. Even more, most keys likely won't need to move nodes, so it we should first identify the keys that must move before getting their corresponding object as else it would be wasteful to retrieve the entire object for many keys that don't need to be relocated. 

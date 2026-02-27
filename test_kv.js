@@ -11,7 +11,7 @@ const randomObjects = [];
 for (let i = 0; i < 1000; i++) {
   const key = crypto.randomBytes(8).toString('hex');
   randomObjects.push({key: key, value: key});
-};
+}
 
 const group = {};
 group[id.getSID(n1)] = n1;
@@ -25,36 +25,51 @@ distribution.local.groups.put({gid: 'benchgroup'}, group, (e, v) => {
   });
 });
 
+function printStats(label, latencies, totalTime) {
+  latencies.sort((a, b) => a - b);
+  const avg = latencies.reduce((a, b) => a + b, 0) / latencies.length;
+  const throughput = (latencies.length / totalTime) * 1000;
+
+  console.log(`\n--- ${label} Results ---`);
+  console.log(`Total time: ${totalTime} ms`);
+  console.log(`Throughput: ${throughput.toFixed(2)} objs/sec`);
+  console.log(`Avg latency: ${avg.toFixed(2)} ms/obj`);
+}
+
 function put() {
-  console.log('Inserting 1000 objets...');
-  const start = Date.now();
+  console.log('Inserting 1000 objects...');
+  const latencies = [];
   let done = 0;
+  const totalStart = Date.now();
+
   for (let i = 0; i < randomObjects.length; i++) {
+    const opStart = Date.now();
     distribution.benchgroup.store.put(randomObjects[i].value, randomObjects[i].key, (e, v) => {
+      latencies.push(Date.now() - opStart);
+      if (e) console.log(e);
       done++;
-      if (done == randomObjects.length) {
-        const end = Date.now();
-        const totalTime = end - start;
-        console.log(`Put throughput: ${randomObjects.length / totalTime * 1000}`);
-        console.log(`Put latency: ${totalTime / randomObjects.length * 1000}`);
+      if (done === randomObjects.length) {
+        printStats('PUT', latencies, Date.now() - totalStart);
         get();
       }
     });
   }
-};
+}
 
 function get() {
-  console.log('Getting 1000 objects');
-  const start = Date.now();
+  console.log('\nGetting 1000 objects...');
+  const latencies = [];
   let done = 0;
+  const totalStart = Date.now();
+
   for (let i = 0; i < randomObjects.length; i++) {
+    const opStart = Date.now();
     distribution.benchgroup.store.get(randomObjects[i].key, (e, v) => {
+      latencies.push(Date.now() - opStart);
+      if (e) console.log(e);
       done++;
-      if (done == randomObjects.length) {
-        const end = Date.now();
-        const totalTime = end - start;
-        console.log(`Get throughput: ${randomObjects.length / totalTime * 1000}`);
-        console.log(`Get latency: ${totalTime / randomObjects.length * 1000}`);
+      if (done === randomObjects.length) {
+        printStats('GET', latencies, Date.now() - totalStart);
       }
     });
   }

@@ -10,8 +10,6 @@ require('../helpers/sync-guard');
 const distribution = globalThis.distribution;
 const id = distribution.util.id;
 
-jest.spyOn(process, 'exit').mockImplementation((n) => { });
-jest.setTimeout(5000);
 const beaconGroup = {};
 
 const n1 = {ip: '127.0.0.1', port: 9000};
@@ -24,7 +22,6 @@ test('(15 pts) detect the need to reconfigure', (done) => {
   const keys = ['loe', 'max', 'charlie', 'colin', 'e'];
   const users = keys.map((k) => ({name: k}));
 
-  // Compute expected placement after removing n5
   const remainingNodes = [n1, n2, n3, n4];
   const remainingNids = remainingNodes.map((n) => id.getNID(n));
   const nidToNode = {};
@@ -52,13 +49,13 @@ test('(15 pts) detect the need to reconfigure', (done) => {
     distribution.local.groups.rem('beacongroup', id.getSID(n5), (e, v) => {
       distribution.beacongroup.groups.rem('beacongroup', id.getSID(n5), (e, v) => {
         setTimeout(() => {
-          checkPlacement();
+          checkReconfigured();
         }, 2000);
       });
     });
   }
 
-  function checkPlacement() {
+  function checkReconfigured() {
     let checkDone = 0;
     for (let i = 0; i < keys.length; i++) {
       distribution.beacongroup.mem.get(keys[i], (e, v) => {
@@ -71,13 +68,13 @@ test('(15 pts) detect the need to reconfigure', (done) => {
         }
         checkDone++;
         if (checkDone === keys.length) {
-          verifyDirectPlacement();
+          verifyExpected();
         }
       });
     }
   }
 
-  function verifyDirectPlacement() {
+  function verifyExpected() {
     let verified = 0;
     for (let i = 0; i < keys.length; i++) {
       const kid = id.getID(keys[i]);
