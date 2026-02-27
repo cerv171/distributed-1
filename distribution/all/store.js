@@ -153,8 +153,84 @@ function store(config) {
    * @param {Object.<string, Node>} configuration
    * @param {Callback} callback
    */
+    /**
+     * @param {Object.<string, Node>} configuration
+     * @param {Callback} callback
+     */
   function reconf(configuration, callback) {
-    return callback(new Error('store.reconf not implemented'));
+    local.groups.get(context.gid, (e, curGroup) => {
+      local.groups.put(context.gid, configuration, (e, v) => {
+        const config = {
+          gid: context.gid,
+          key: null,
+        };
+        get(config, (e, keys) => {
+          if (Object.keys(e).length > 0) {
+            return callback(e); // not sure what to do with this error
+          }
+          local.groups.put(context.gid, curGroup, (e, curConfiguration) => {
+            if (e) {
+              return callback(e);
+            }
+            if (keys.length == 0) {
+              return callback(null);
+            }
+            const oldNidToNode = {};
+            const newNidToNode = {};
+            const oldNids = Object.entries(configuration).map((obj) => {
+              const nid = util.id.getNID(obj[1]);
+              oldNidToNode[nid] = obj[1];
+              return nid;
+            });
+            const newNids = Object.entries(curConfiguration).map((obj) => {
+              const nid = util.id.getNID(obj[1]);
+              newNidToNode[nid] = obj[1];
+              return nid;
+            });
+            /** @type {Object<string, Error>} */
+            const errors = {};
+            const putResults = {};
+            let resolved = 0;
+            const keysToMove = keys.filter((key) => {
+              return context.hash(util.id.getID(key), oldNids) != context.hash(util.id.getID(key), newNids);
+            });
+            const handleDone = () => {
+              if ((resolved == keysToMove.length)) {
+                return callback(null, putResults);
+              }
+            };
+            if (keysToMove.length === 0) return callback(null, {});
+            for (const key of keysToMove) {
+              const oldNode = oldNidToNode[context.hash(util.id.getID(key), oldNids)];
+              const newNode = newNidToNode[context.hash(util.id.getID(key), newNids)];
+              const message = {gid: context.gid, key: key};
+              const delRemote = {node: oldNode, service: 'store', method: 'del'};
+              local.comm.send([message], delRemote, (e, delVal) => {
+                if (e) {
+                  errors[key] = e;
+                  resolved++;
+                  handleDone();
+                  return;
+                };
+                const putRemote = {node: newNode, service: 'store', method: 'put'};
+                const putMessage = [delVal, {gid: context.gid, key: key}];
+                local.comm.send(putMessage, putRemote, (e, putResult) => {
+                  if (e) {
+                    errors[key] = e;
+                    resolved++;
+                    handleDone();
+                    return;
+                  }
+                  putResults[key] = putResult;
+                  resolved++;
+                  handleDone();
+                });
+              });
+            }
+          });
+        });
+      });
+    });
   }
 
   /* For the distributed store service, the configuration will

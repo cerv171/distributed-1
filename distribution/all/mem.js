@@ -149,83 +149,77 @@ function mem(config) {
    * @param {Callback} callback
    */
   function reconf(configuration, callback) {
-    const config = {
-      gid: context.gid,
-      key: null,
-    };
-    get(config, (e, keys) => {
-      if (Object.keys(e).length > 0) {
-        return callback(e); // not sure what to do with this error
-      }
-      local.groups.get(context.gid, (e, curConfiguration) => {
-        const oldNidToNode = {};
-        const newNidToNode = {};
-        const oldNids = Object.entries(configuration).map((obj) => {
-          const nid = util.id.getNID(obj[1]);
-          oldNidToNode[nid] = obj[1];
-          return nid;
-        });
-        const newNids = Object.entries(curConfiguration).map((obj) => {
-          const nid = util.id.getNID(obj[1]);
-          newNidToNode[nid] = obj[1];
-          return nid;
-        });
-        /** @type {Object<string, Error>} */
-        const errors = {};
-        const putResults = {};
-        let toResolve = 0;
-        let resolved = 0;
-        let checkedAll = false;
-        const handleDone = () => {
-          if ((resolved == toResolve) && checkedAll) {
-            return callback(null, putResults);
-          }
+    local.groups.get(context.gid, (e, curGroup) => {
+      local.groups.put(context.gid, configuration, (e, v) => {
+        const config = {
+          gid: context.gid,
+          key: null,
         };
-        for (const key of keys) {
-          const oldNid = context.hash(util.id.getID(key), oldNids);
-          const newNid = context.hash(util.id.getID(key), newNids);
-          if (oldNid != newNid && newNids.includes(oldNid)) {
-            const oldNode = oldNidToNode[oldNid];
-            const newNode = newNidToNode[newNid];
-            console.log(key, oldNode.port, newNode.port);
-            toResolve++;
-            const message = {gid: context.gid, key: key};
-            const remote = {node: oldNode, service: 'mem', method: 'get'};
-            local.comm.send([message], remote, (e, getVal) => {
-              if (e) {
-                errors[key] = e;
-                resolved++;
-                handleDone();
-                return;
-              } else {
-                const delRemote = {node: oldNode, service: 'mem', method: 'del'};
-                local.comm.send([message], delRemote, (e, delVal) => {
+        get(config, (e, keys) => {
+          if (Object.keys(e).length > 0) {
+            return callback(e); // not sure what to do with this error
+          }
+          local.groups.put(context.gid, curGroup, (e, curConfiguration) => {
+            if (e) {
+              return callback(e);
+            }
+            if (keys.length == 0) {
+              return callback(null);
+            }
+            const oldNidToNode = {};
+            const newNidToNode = {};
+            const oldNids = Object.entries(configuration).map((obj) => {
+              const nid = util.id.getNID(obj[1]);
+              oldNidToNode[nid] = obj[1];
+              return nid;
+            });
+            const newNids = Object.entries(curConfiguration).map((obj) => {
+              const nid = util.id.getNID(obj[1]);
+              newNidToNode[nid] = obj[1];
+              return nid;
+            });
+            /** @type {Object<string, Error>} */
+            const errors = {};
+            const putResults = {};
+            let resolved = 0;
+            const keysToMove = keys.filter((key) => {
+              return context.hash(util.id.getID(key), oldNids) != context.hash(util.id.getID(key), newNids);
+            });
+            const handleDone = () => {
+              if ((resolved == keysToMove.length)) {
+                return callback(null, putResults);
+              }
+            };
+            if (keysToMove.length === 0) return callback(null, {});
+            for (const key of keysToMove) {
+              const oldNode = oldNidToNode[context.hash(util.id.getID(key), oldNids)];
+              const newNode = newNidToNode[context.hash(util.id.getID(key), newNids)];
+              const message = {gid: context.gid, key: key};
+              const delRemote = {node: oldNode, service: 'mem', method: 'del'};
+              local.comm.send([message], delRemote, (e, delVal) => {
+                if (e) {
+                  errors[key] = e;
+                  resolved++;
+                  handleDone();
+                  return;
+                };
+                const putRemote = {node: newNode, service: 'mem', method: 'put'};
+                const putMessage = [delVal, {gid: context.gid, key: key}];
+                local.comm.send(putMessage, putRemote, (e, putResult) => {
                   if (e) {
                     errors[key] = e;
                     resolved++;
                     handleDone();
                     return;
-                  };
-                  const putRemote = {node: newNode, service: 'mem', method: 'put'};
-                  const putMessage = [getVal, {gid: context.gid, key: key}];
-                  local.comm.send(putMessage, putRemote, (e, putResult) => {
-                    if (e) {
-                      errors[key] = e;
-                      resolved++;
-                      handleDone();
-                      return;
-                    }
-                    putResults[key] = putResult;
-                    resolved++;
-                    handleDone();
-                  });
+                  }
+                  putResults[key] = putResult;
+                  resolved++;
+                  handleDone();
                 });
-              }
-            });
-          }
-        }
-        checkedAll = true;
-        handleDone();
+              });
+            }
+          });
+        });
       });
     });
   }
@@ -238,6 +232,6 @@ function mem(config) {
     del,
     reconf,
   };
-}
+};
 
 module.exports = mem;

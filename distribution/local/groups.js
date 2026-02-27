@@ -30,10 +30,12 @@ function get(name, callback) {
  */
 function put(config, group, callback) {
   let gid = typeof config != 'string' ? config.gid : config;
-  globalThis.distribution[gid] = {};
-  const {setup} = require('../all/all.js');
-  globalThis.distribution[gid] = setup(typeof config === 'object' ? config : {gid: gid});
-  groups[gid] = group;
+  if (!globalThis.distribution[gid]) {
+    globalThis.distribution[gid] = {};
+    const {setup} = require('../all/all.js');
+    globalThis.distribution[gid] = setup(typeof config === 'object' ? config : {gid: gid});
+  }
+  groups[gid] = {...group};
   return callback(null, groups[gid]);
 }
 

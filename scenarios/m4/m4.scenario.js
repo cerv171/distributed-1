@@ -251,6 +251,19 @@ test('(5 pts) (scenario) redistribute keys and values among nodes', (done) => {
     // Helper to process a single node's data
     const processNode = (node, dataToProcess, callback) => {
       const entries = Object.entries(dataToProcess);
+      let sent = 0;
+      for (const k in dataToProcess) {
+        const remote = {node: node, service: 'store', method: 'get'};
+        const config = {key: k, gid: 'local'};
+        distribution.local.comm.send([config], remote, (e, val) => {
+          distribution.shuffleGroup.store.append(val, {key: k}, (e, v) => {
+            sent++;
+            if (sent == entries.length) {
+              return callback();
+            }
+          });
+        });
+      }
     };
 
     // Process n1's data, then n2's data, and finlly check the results
@@ -267,11 +280,11 @@ test('(5 pts) (scenario) redistribute keys and values among nodes', (done) => {
       try {
         expect(e).toBeFalsy();
         // What do you expect the value to be?
-
+        expect(v).toEqual(expect.arrayContaining(['one', 'two']));
         // Check 'lc' aggregation
         distribution.shuffleGroup.store.get('lc', (e, v) => {
           expect(e).toBeFalsy();
-          // What do you expect the value to be?
+          expect(v).toEqual(expect.arrayContaining(['three']));
           done();
         });
       } catch (error) {

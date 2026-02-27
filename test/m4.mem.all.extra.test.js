@@ -71,7 +71,6 @@ test('(10 pts) all.mem.reconf', (done) => {
     'd',
     'e',
   ];
-
   const expectedGroup = {...mygroupGroup};
   delete expectedGroup[id.getSID(n3)];
   const expectedNids = Object.values(expectedGroup).map((node) => id.getNID(node));
@@ -92,7 +91,6 @@ test('(10 pts) all.mem.reconf', (done) => {
         [{key: keys[3], gid: 'mygroup'}],
         [{key: keys[4], gid: 'mygroup'}],
       ];
-
       distribution.local.comm.send(
           messages[0],
           {node: expectedNodeForKey(keys[0]), service: 'mem', method: 'get'},

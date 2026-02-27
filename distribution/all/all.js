@@ -39,6 +39,9 @@ const store = require('./store.js');
 /* Map-Reduce Service */
 const mr = require('./mr.js');
 
+/* Beacon */
+const beacon = require('./beacon.js');
+
 /**
  * @typedef {Object} GroupServices
  * @property {import("./comm.js").Comm} comm
@@ -54,7 +57,7 @@ const mr = require('./mr.js');
  * @returns {GroupServices}
  */
 function setup(config) {
-  return {
+  const services = {
     comm: comm(config),
     groups: groups(config),
     status: status(config),
@@ -64,6 +67,8 @@ function setup(config) {
     store: store(config),
     mr: mr(config),
   };
+  setTimeout(() => beacon.startBeacon(config.gid), 2);
+  return services;
 }
 
 module.exports = {
