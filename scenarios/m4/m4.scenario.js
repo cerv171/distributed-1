@@ -266,6 +266,7 @@ test('(5 pts) (scenario) redistribute keys and values among nodes', (done) => {
       }
     };
 
+
     // Process n1's data, then n2's data, and finlly check the results
     processNode(n1, n1Data, () => {
       processNode(n2, n2Data, () => {

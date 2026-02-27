@@ -7,14 +7,15 @@
 const log = require('../util/log.js');
 const crypto = require('crypto');
 
-globalThis.distribution.toLocal = {};
-
 /**
  * @param {Function} func
  * @returns {Function} func
  */
 function createRPC(func) {
   const ptr = crypto.randomBytes(32).toString('hex');
+  if (!globalThis.distribution.toLocal) {
+    globalThis.distribution.toLocal = {};
+  }
   globalThis.distribution.toLocal[ptr] = func;
 
   function stub(...args) {
@@ -30,9 +31,9 @@ function createRPC(func) {
   }
   const config = globalThis.distribution.node.config;
   let stub_str = stub.toString()
-    .replace('__NODE_IP__', config.ip)
-    .replace('__NODE_PORT__', String(config.port))
-    .replace('__FUNC_ID__', ptr);
+  .replace('__NODE_IP__', config.ip)
+  .replace('__NODE_PORT__', String(config.port))
+  .replace('__FUNC_ID__', ptr);
   return new Function('return ' + stub_str)();
 }
 

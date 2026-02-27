@@ -18,6 +18,7 @@ function bootstrap(config) {
 
   // @ts-ignore This is the first time globalThis.distribution is being initialized, so the object does not have all the necessary properties.
   globalThis.distribution = distribution;
+  distribution.toLocal = {};
   distribution.util = require('./distribution/util/util.js');
 
   // @ts-ignore node.server is lazily initialized.
