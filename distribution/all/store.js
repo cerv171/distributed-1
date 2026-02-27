@@ -33,7 +33,8 @@ function store(config) {
    */
   function get(configuration, callback) {
     const key = (typeof(configuration) == 'string' || configuration == null) ? /** @type {string | null} */ (configuration) : configuration.key;
-    local.groups.get(context.gid, (e, /** @type {Object.<string, Node>} */ group) => {
+    const gid = (configuration != null && typeof(configuration) == 'object' && configuration.gid) ? configuration.gid : context.gid;
+    local.groups.get(gid, (e, /** @type {Object.<string, Node>} */ group) => {
       if (e) {
         return callback(e);
       }
@@ -45,28 +46,31 @@ function store(config) {
       if (key) {
         const targetNode = nidsToNode[context.hash(util.id.getID(key), nids)];
         const remote = {node: targetNode, service: 'store', method: 'get'};
-        const params = {key: key, gid: context.gid};
+        const params = {key: key, gid: gid};
         local.comm.send([params], remote, (e, v) => {
           return callback(e, v);
         });
       } else {
         const keys = [];
+        /** @type {Object.<String, Error>} */
+        const errors = {};
         let sent = 0;
         for (const node of Object.values(group)) {
           const remote = {node: node, service: 'store', method: 'get'};
-          const params = {key: key, gid: context.gid};
+          const params = {key: key, gid: gid};
           local.comm.send([params], remote, (e, v) => {
             if (e) {
-              return callback(Error(e.message));
+              errors[util.id.getNID(node)] = e;
+            } else {
+              keys.push(...v);
             }
             sent++;
-            keys.push(...v);
             if (sent == Object.keys(group).length) {
               const unique = [...new Set(keys)];
               if (unique.length !== keys.length) {
                 return callback(Error('duplicate keys found'));
               }
-              return callback(null, keys);
+              return callback(errors, keys);
             }
           });
         }
@@ -82,7 +86,8 @@ function store(config) {
   function put(state, configuration, callback) {
     /** @type {string | null} */
     const key = ((configuration == null || typeof(configuration) === 'string') ? /** @type {string | null} */ (configuration) : configuration.key) || util.id.getID(state);
-    local.groups.get(context.gid, (e, /** @type {Object.<string, Node>} */ group) => {
+    const gid = (configuration != null && typeof(configuration) == 'object' && configuration.gid) ? configuration.gid : context.gid;
+    local.groups.get(gid, (e, /** @type {Object.<string, Node>} */ group) => {
       if (e) {
         return callback(e);
       }
@@ -92,7 +97,7 @@ function store(config) {
         nidsToNode[util.id.getNID(node)] = node;
       }
       const targetNode = nidsToNode[context.hash(util.id.getID(key), nids)];
-      const message = {key: key, gid: context.gid};
+      const message = {key: key, gid: gid};
       const remote = {node: targetNode, service: 'store', method: 'put'};
       local.comm.send([state, message], remote, (e, v) => {
         if (e) {
@@ -119,10 +124,11 @@ function store(config) {
   function del(configuration, callback) {
     /** @type {string | null} */
     const key = ((configuration == null || typeof(configuration) === 'string') ? /** @type {string | null} */ (configuration) : configuration.key);
+    const gid = (configuration != null && typeof(configuration) == 'object' && configuration.gid) ? configuration.gid : context.gid;
     if (key == null) {
       return callback(Error(`can't delete null key`));
     }
-    local.groups.get(context.gid, (e, /** @type {Object.<string, Node>} */ group) => {
+    local.groups.get(gid, (e, /** @type {Object.<string, Node>} */ group) => {
       if (e) {
         return callback(e);
       }
@@ -132,7 +138,7 @@ function store(config) {
         nidsToNode[util.id.getNID(node)] = node;
       }
       const targetNode = nidsToNode[context.hash(util.id.getID(key), nids)];
-      const message = {key: key, gid: context.gid};
+      const message = {key: key, gid: gid};
       const remote = {node: targetNode, service: 'store', method: 'del'};
       local.comm.send([message], remote, (e, v) => {
         if (e) {

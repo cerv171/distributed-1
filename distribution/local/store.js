@@ -66,7 +66,7 @@ function get(configuration, callback) {
   if (key == null) {
     const dirPath = path.join(storePath, `${util.id.getNID(globalThis.distribution.node.config)}/${group}`);
     if (!fs.existsSync(dirPath)) {
-      return callback(Error(`group ${group} does not exist`));
+      return callback(null, []);
     }
     return callback(null, fs.readdirSync(dirPath).map((filename) => filename.replace('.txt', '')));
   } else {

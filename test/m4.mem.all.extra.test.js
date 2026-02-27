@@ -122,6 +122,7 @@ test('(10 pts) all.mem.reconf', (done) => {
                       {node: expectedNodeForKey(keys[2]), service: 'mem', method: 'get'},
                       (e, v) => {
                         try {
+                          console.log(e);
                           expect(e).toBeFalsy();
                           expect(v).toEqual(users[2]);
                         } catch (error) {
