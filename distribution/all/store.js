@@ -114,7 +114,28 @@ function store(config) {
    * @param {Callback} callback
    */
   function append(state, configuration, callback) {
-    return callback(new Error('store.append not implemented')); // You'll need to implement this method for the distributed processing milestone.
+    globalThis.distribution.util.log(`append called ${configuration}`, 'info');
+    const key = ((configuration == null || typeof(configuration) === 'string') ? configuration : configuration.key) || util.id.getID(state);
+    const gid = (configuration != null && typeof(configuration) == 'object' && configuration.gid) ? configuration.gid : context.gid;
+    local.groups.get(gid, (e, /** @type {Object.<string, Node>} */ group) => {
+      if (e) {
+        return callback(e);
+      }
+      const nids = Object.values(group).map((node) => util.id.getNID(node));
+      const nidsToNode = {};
+      for (const node of Object.values(group)) {
+        nidsToNode[util.id.getNID(node)] = node;
+      }
+      const targetNode = nidsToNode[context.hash(util.id.getID(key), nids)];
+      const message = {key: key, gid: gid};
+      const remote = {node: targetNode, service: 'store', method: 'append'};
+      local.comm.send([state, message], remote, (e, v) => {
+        if (e) {
+          return callback(Error(e.message));
+        }
+        return callback(null, v);
+      });
+    });
   }
 
   /**

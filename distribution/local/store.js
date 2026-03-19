@@ -9,16 +9,14 @@
  * @typedef {StoreConfig | string | null} SimpleConfig
  */
 
-/* Notes/Tips:
-
-- Use absolute paths to make sure they are agnostic to where your code is running from!
-  Use the `path` module for that.
-*/
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 const util = globalThis.distribution.util;
 const storePath = path.join(__dirname, '..', '..', 'store');
+
+const encodeKey = (key) => Buffer.from(key).toString('hex');
+const decodeKey = (hex) => Buffer.from(hex, 'hex').toString();
 
 /**
  * @param {any} state
@@ -39,7 +37,7 @@ function put(state, configuration, callback) {
       return callback(Error('store put must be a SimpleConfig type or string'));
     }
   }
-  const filePath = path.join(storePath, `${util.id.getNID(globalThis.distribution.node.config)}/${group}/${key}.txt`);
+  const filePath = path.join(storePath, `${util.id.getNID(globalThis.distribution.node.config)}/${group}/${encodeKey(key)}.txt`);
   fs.mkdirSync(path.dirname(filePath), {recursive: true});
   fs.writeFileSync(filePath, util.serialize(state));
   return callback(null, state);
@@ -68,9 +66,9 @@ function get(configuration, callback) {
     if (!fs.existsSync(dirPath)) {
       return callback(null, []);
     }
-    return callback(null, fs.readdirSync(dirPath).map((filename) => filename.replace('.txt', '')));
+    return callback(null, fs.readdirSync(dirPath).map((filename) => decodeKey(filename.replace('.txt', ''))));
   } else {
-    const filePath = path.join(storePath, `${util.id.getNID(globalThis.distribution.node.config)}/${group}/${key}.txt`);
+    const filePath = path.join(storePath, `${util.id.getNID(globalThis.distribution.node.config)}/${group}/${encodeKey(key)}.txt`);
     if (!fs.existsSync(filePath)) {
       return callback(Error(`key ${key} does not exist in group ${group}`));
     }
@@ -97,7 +95,7 @@ function del(configuration, callback) {
       return callback(Error('del put must be a SimpleConfig type or string'));
     }
   }
-  const filePath = path.join(storePath, `${util.id.getNID(globalThis.distribution.node.config)}/${group}/${key}.txt`);
+  const filePath = path.join(storePath, `${util.id.getNID(globalThis.distribution.node.config)}/${group}/${encodeKey(key)}.txt`);
   if (!fs.existsSync(filePath)) {
     return callback(Error(`storage: key ${key} does not exist in group ${group}`));
   }
@@ -112,7 +110,31 @@ function del(configuration, callback) {
  * @param {Callback} callback
  */
 function append(state, configuration, callback) {
-  return callback(new Error('store.append not implemented')); // You'll need to implement this method for the distributed processing milestone.
+  let group;
+  let key;
+  if (typeof(configuration) == 'string' || configuration == null) {
+    group = 'local';
+    key = configuration == null ? util.id.getID(state) : configuration;
+  } else {
+    if (typeof(configuration) == 'object' && configuration.gid && configuration.key) {
+      group = configuration.gid;
+      key = configuration.key;
+    } else {
+      return callback(Error('store append must be a SimpleConfig type or string'));
+    }
+  }
+  const filePath = path.join(storePath, `${util.id.getNID(globalThis.distribution.node.config)}/${group}/${encodeKey(key)}.txt`);
+  fs.mkdirSync(path.dirname(filePath), {recursive: true});
+  let existing = [];
+  if (fs.existsSync(filePath)) {
+    existing = util.deserialize(fs.readFileSync(filePath, 'utf8'));
+    if (!Array.isArray(existing)) {
+      existing = [existing];
+    }
+  }
+  existing.push(state);
+  fs.writeFileSync(filePath, util.serialize(existing));
+  return callback(null, existing);
 }
 
 module.exports = {put, get, del, append};

@@ -228,3 +228,31 @@ To characterize performance, I ran ran the distributed store on three aws nodes,
 > Why is the `reconf` method designed to first identify all the keys to be relocated and then relocate individual objects instead of fetching all the objects immediately and then pushing them to their corresponding locations?
 
 The objects could take up a lot of memory and fetching all objects at once could bottleneck the node. Even more, most keys likely won't need to move nodes, so it we should first identify the keys that must move before getting their corresponding object as else it would be wasteful to retrieve the entire object for many keys that don't need to be relocated. 
+
+
+
+# M5: Distributed Execution Engine
+
+
+## Summary
+
+> Summarize your implementation, including key challenges you encountered. Remember to update the `report` section of the `package.json` file with the total number of hours it took you to complete each task of M5 (`hours`) and the lines of code per task.
+
+
+My implementation covers the all/mr.js file, totallling around 400 lines of code. I pretty closesly followed the design in the stencil, registering a map reduce service on each node in the group and creating an rpc function for notifying from group nodes to the distributor node. At the end of each stage - map, shuffle, reduce - the group nodes call the notify rpc function which upon receiving all notify requests from group, advances the current stage by invoking a callback passed to the notify function. At the end of reduce, each group node passes its final data to the notify function and the notify function returns that data to exec.
+
+
+## Correctness & Performance Characterization
+
+To characterize performance, I ran the given maximum temperature workflow many times in sequence on three local nodes and recorded the average time to complete, getting around 42 ms.
+
+
+*Correctness*: I wrote 5 cases testing various map and reduce functions with edge cases like map reduce returning empty data, key collisions, and fan in from many values mapped to a single value.
+
+
+*Performance*: My map reduce function can sustain 23.8 calls/second, with an average latency of 0.042 seconds per call for the max weather worfklow.
+
+
+## Key Feature
+
+No extra features were impelemented.

@@ -31,9 +31,9 @@ function createRPC(func) {
   }
   const config = globalThis.distribution.node.config;
   let stub_str = stub.toString()
-  .replace('__NODE_IP__', config.ip)
-  .replace('__NODE_PORT__', String(config.port))
-  .replace('__FUNC_ID__', ptr);
+      .replace('__NODE_IP__', config.ip)
+      .replace('__NODE_PORT__', String(config.port))
+      .replace('__FUNC_ID__', ptr);
   return new Function('return ' + stub_str)();
 }
 
